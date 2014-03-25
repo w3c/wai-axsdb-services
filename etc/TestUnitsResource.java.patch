@@ -1,0 +1,59 @@
+Index: src/main/java/org/w3c/wai/accessdb/rest/resources/TestUnitsResource.java
+===================================================================
+--- src/main/java/org/w3c/wai/accessdb/rest/resources/TestUnitsResource.java	(revision 12354)
++++ src/main/java/org/w3c/wai/accessdb/rest/resources/TestUnitsResource.java	(working copy)
+@@ -25,6 +25,7 @@
+ import org.codehaus.jackson.map.ObjectMapper;
+ import org.slf4j.Logger;
+ import org.slf4j.LoggerFactory;
++import org.tmatesoft.svn.core.SVNException;
+ import org.w3c.wai.accessdb.eao.EAOManager;
+ import org.w3c.wai.accessdb.eao.TechniqueEAO;
+ import org.w3c.wai.accessdb.helpers.TestUnitHelper;
+@@ -34,8 +35,9 @@
+ import org.w3c.wai.accessdb.om.testunit.RefFileType;
+ import org.w3c.wai.accessdb.om.testunit.TestUnitDescription;
+ import org.w3c.wai.accessdb.services.ConfigService;
+-import org.w3c.wai.accessdb.services.TestsService;
++import org.w3c.wai.accessdb.services.SVNService;
+ import org.w3c.wai.accessdb.services.TestingSessionService;
++import org.w3c.wai.accessdb.services.TestsService;
+ import org.w3c.wai.accessdb.utils.ASBPersistenceException;
+ import org.w3c.wai.accessdb.utils.InOutUtils;
+ import org.w3c.wai.accessdb.utils.JAXBUtils;
+@@ -346,7 +348,14 @@
+                     .getTestUnitDescriptionEAO().persist(testUnitDescription);
+             logger.info("testUnitDescription saved : "
+                     + testUnitDescription.getTestUnitId());
+-
++            try{
++                TestsService.INSTANCE.test2XMLFile(testUnitDescription);
++                logger.info("xml exported");   
++                SVNService.INSTANCE.testInRepoCommit(testFolder); 
++            }
++            catch(Exception e){
++            	logger.warn(e.getLocalizedMessage());
++            }
+         }
+         catch (Exception e)
+         {
+@@ -356,10 +365,18 @@
+                 try {
+ 					EAOManager.INSTANCE.getTestUnitDescriptionEAO().delete(
+ 					        testUnitDescription);
+-				} catch (ASBPersistenceException e1) {
++		            logger.info("rolling back testUnitDescription");
++
++                } catch (ASBPersistenceException e1) {
+ 					logger.error(e1.getLocalizedMessage());
+ 				}
+                 InOutUtils.deleteFolderContents(testFolder);
++                try {
++					SVNService.INSTANCE.testInRepoCommit(testFolder);
++				} catch (SVNException e1) {
++					// TODO Auto-generated catch block
++					logger.warn(e1.getLocalizedMessage());
++				} 
+             }
+             return Response.notModified(e.getLocalizedMessage()).build();
+         }

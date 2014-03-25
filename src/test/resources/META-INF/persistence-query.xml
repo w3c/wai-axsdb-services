@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<entity-mappings xmlns="http://java.sun.com/xml/ns/persistence/orm"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence/orm http://java.sun.com/xml/ns/persistence/orm_1_0.xsd"
+	version="1.0">
+	<named-query name="TestResult.countUniqueContributorsByTechnique">
+		<query>select count(DISTINCT b.optionalName) from TestResult as r, TestResultsBunch as b where r in elements(b.results) and r.testUnitDescription.technique.nameId = ?</query>
+	</named-query>
+	
+	<named-query name="TestResult.findUniqueATCombinationsByTechnique">
+		<query>select DISTINCT	res.testingProfile.assistiveTechnology.name as atName, res.testingProfile.assistiveTechnology.version.text as atVersion, res.testingProfile.userAgent.name as uaName, res.testingProfile.userAgent.version.text as uaVersion, res.testingProfile.platform.name as osName, res.testingProfile.platform.version.text as osVersion from TestResult as res where res.testUnitDescription.technique.nameId = ? ORDER BY res.testingProfile.assistiveTechnology.name, res.testingProfile.assistiveTechnology.version.text, res.testingProfile.userAgent.name, res.testingProfile.userAgent.version.text, res.testingProfile.platform.name, res.testingProfile.platform.version.text</query>
+	</named-query> 
+	<named-query name="TestResult.findUniqueATCombinations">
+		<query>select DISTINCT	r.testingProfile.assistiveTechnology.name as atName, r.testingProfile.assistiveTechnology.version.text as atVersion, r.testingProfile.userAgent.name as uaName, r.testingProfile.userAgent.version.text as uaVersion, r.testingProfile.platform.name as osName, r.testingProfile.platform.version.text as osVersion from TestResult as r ORDER BY r.testingProfile.assistiveTechnology.name, r.testingProfile.assistiveTechnology.version.text, r.testingProfile.userAgent.name, r.testingProfile.userAgent.version.text, r.testingProfile.platform.name, r.testingProfile.platform.version.text</query>
+	</named-query> 
+	<named-query name="TestResult.findByTestUnitId">
+		<query>select r from TestResult as r, TestUnitDescription as tu where r.testUnitDescription.id=tu.id and tu.testUnitId = ? </query>
+	</named-query>
+	<named-query name="TestResult.countPassByTechniqueNameId">
+		<query>select count(DISTINCT r) from TestResult as r, TestUnitDescription as tu where tu.testUnitId=r.testUnitDescription.testUnitId and r.resultValue=true and tu.technique.nameId = ? </query>
+	</named-query>
+	<named-query name="TestResult.countAllByTechniqueNameId">
+		<query>select count(DISTINCT r) from TestResult as r, TestUnitDescription as tu where tu.testUnitId=r.testUnitDescription.testUnitId and tu.technique.nameId = ? </query>
+	</named-query>	
+	<named-query name="TestResult.findByTechniqueNameId">
+		<query>from TestResult where testUnitDescription.technique.nameId = ?</query>
+	</named-query>
+	
+	<named-query name="TestResultsBunch.findbyTestResultId">
+		<query>select b from TestResult as r, TestResultsBunch as b where r in elements(b.results) and r.id = ? </query>
+	</named-query>
+	<named-query name="WebTechnology.findbyNameId">
+		<query>from WebTechnology where nameId = ?</query>
+	</named-query> 
+	
+	<named-query name="TestUnitDescription.findbyUnitId">
+		<query>from TestUnitDescription where testUnitId = ?</query>
+	</named-query>
+	
+	<named-query name="TestUnitDescription.findbyTechnique">
+		<query>from TestUnitDescription where technique.nameId = ?</query>
+	</named-query>
+	
+	
+	<named-query name="Technique.byTerm">
+		<query>from Technique where title like ? or nameId like ?</query>
+	</named-query>
+	<named-query name="Technique.byNameId">
+		<query>from Technique where nameId = ?</query>
+	</named-query>
+	<named-query name="Rating.RatingsByRatedId">
+		<query>from Rating where ratedId =  ?</query>
+	</named-query>
+	<named-query name="Rating.AverageByRatedId">
+		<query>select avg(ratingValue) from Rating where ratedId =  ?</query>
+	</named-query>
+	<named-query name="SuccessCriterio.findbyIdRef">
+		<query>from SuccessCriterio where idRef =  ?</query>
+	</named-query>
+	
+	<named-query name="SuccessCriterioTechniqueRelation.findByTechniqueNameId">
+		<query>from SuccessCriterioTechniqueRelation where technique.nameId = ?</query>
+	</named-query>
+	<named-query name="SuccessCriterio.findByTechniqueNameId">
+		<query>select s from SuccessCriterio as s, Technique as t where t in elements(s.techniques) and t.nameId = ?</query>
+	</named-query>
+		
+	
+	<named-query name="TestingProfile.at">
+		<query>select DISTINCT r.testingProfile.assistiveTechnology.name from TestResult as r where r.testingProfile.assistiveTechnology.name like ?</query>
+	</named-query>
+<!-- 	<named-query name="TestingProfile.platforms">
+		<query>select DISTINCT concat(trim(p.platform.name), '/v.', trim(p.platform.productVersion)) from TestingProfile as p where p.platform.name like ?</query>
+	</named-query> -->
+	<named-query name="TestingProfile.platforms">
+		<query>select DISTINCT r.testingProfile.platform.name from TestResult as r where r.testingProfile.platform.name like ?</query>
+	</named-query>
+	
+	<named-query name="TestingProfile.ua">
+		<query>select DISTINCT r.testingProfile.userAgent.name from TestResult as r where r.testingProfile.userAgent.name like ?</query>
+	</named-query>
+	<named-query name="TestingProfile.plugins">
+		<query>select DISTINCT r.testingProfile.plugin.name from TestResult as r where r.testingProfile.plugin.name like ?</query>
+	</named-query>
+	<named-query name="User.findByUserId">
+		<query>from User where userId = ?</query>
+	</named-query>
+	<named-query name="User.findByMail">
+		<query>from User where mail = ?</query>
+	</named-query>
+	<named-query name="Technique.findByWebTechNameId">
+		<query>from Technique where webTechnology.nameId = ?</query>
+	</named-query>
+	
+</entity-mappings>

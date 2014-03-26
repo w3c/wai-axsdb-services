@@ -1,0 +1,3 @@
+http://clickonchris.com/2010/05/configuring-jetty-maven-and-eclipse-together-with-hot-deploy/
+http://www.eclipse.org/webtools/dali/
+http://wiki.eclipse.org/JPA_Diagram_Editor_Project_Tutorial#Open_JPA_Diagram_Editor

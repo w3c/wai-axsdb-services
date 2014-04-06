@@ -149,9 +149,7 @@ public enum TestsService {
 			}
 			s.getResourceFiles().clear();
 		}
-		p = (TestProcedure) EAOManager.INSTANCE.getObjectEAO().persist(p);
 		testUnitDescription.setTestProcedure(p);
-		s = (Subject) EAOManager.INSTANCE.getObjectEAO().persist(s);
 		testUnitDescription.setSubject(s);
 		return eao.persist(testUnitDescription);
 	}
@@ -319,8 +317,6 @@ public enum TestsService {
 	public TestUnitDescription prepareTestMeta(TestUnitDescription tu) {
 		// prepare meta for new database
 		tu.setId(-1);
-		tu.getSubject().setId(-1);
-		tu.getTestProcedure().setId(-1);
 		String techniqueN = tu.getTechnique().getNameId();
 		Technique technique = EAOManager.INSTANCE.getTechniqueEAO()
 				.findByNameId(techniqueN);

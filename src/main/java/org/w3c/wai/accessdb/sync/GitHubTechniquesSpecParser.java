@@ -41,6 +41,7 @@ public class GitHubTechniquesSpecParser {
 	 */
 	public static ImportResponse<List<GitHubTechniqueInfo>> prepareImport(
 			String urlS) {
+		String branch = urlS.split("/")[5];
 		ImportResponse<List<GitHubTechniqueInfo>> result = new ImportResponse<List<GitHubTechniqueInfo>>();
 		List<GitHubTechniqueInfo> infos = new ArrayList<GitHubTechniqueInfo>();
 		try {
@@ -90,7 +91,7 @@ public class GitHubTechniquesSpecParser {
 				String href = e.getAttribute("href");
 				fullHref = parentPath + "/" + href;
 				logger.debug("for technique url: " + href);
-				GitHubTechniqueInfo info = getTechniqueGitMeta(href);
+				GitHubTechniqueInfo info = getTechniqueGitMeta(href,branch);
 				info.setUrl(fullHref);
 				info.setTechnique(FilenameUtils.getBaseName(href));
 				info.setWebTechnology(webTechnology);
@@ -98,16 +99,46 @@ public class GitHubTechniquesSpecParser {
 				infos.add(info);
 			}
 			result.setEntity(infos);
-			result.setMessage(null);
-			result.setSuccess(true);
+			result.setStatusCode(ImportResponse.SUCCESS);
 		} catch (Exception e) {
 			result.setEntity(infos);
-			result.setMessage(e.getLocalizedMessage());
-			result.setSuccess(false);
+			result.setStatusCode(ImportResponse.FAIL);
 		}
 		return result;
 	}
+	public static GitHubTechniqueInfo getTechniqueGitMeta(String techniquePath, String branch)
+			throws Exception {
+		// TODO: make configurable and try to guess
+		// TODO: authenticate to allow more requests.. maybe not important
+		String apiUrl = "https://api.github.com/repos/w3c/wcag/commits";
+		//String branch = "Working-Branch-for-Fall-2014";
+		logger.debug("using branch: " + branch);
+		//branch from url
+		String techniquesPath = "wcag20/sources/techniques/";
+		String path = techniquesPath + techniquePath;
+		String reqUrl = apiUrl + "?" + "sha=" + branch + "&path=" + path;
+		logger.debug("REST GETING from " + reqUrl);
+		ClientResponse<String> response = null;
+		GitHubTechniqueInfo gitHubInfo = null;
+		ClientRequest request = new ClientRequest(reqUrl);
+		response = request.get(String.class);
+		if (response.getStatus() != 200) {
+			response.releaseConnection();
+			logger.warn("REST Failed! " + response.getStatus());
+			if (response.getStatus() == 403) {
+				throw new RuntimeException(
+						"API rate limit exceeded. See https://developer.github.com/v3/#rate-limiting for details.");
+			} else {
+				throw new RuntimeException(new Throwable(response.getEntity()));
+			}
 
+		} else {
+			gitHubInfo = GitHubFactory
+					.createGitHubTechniqueInfoFromStringJson(response
+							.getEntity());
+		}
+		return gitHubInfo;
+	}
 	public static List<ImportResponse<GitHubTechniqueInfo>> filterTechniques(
 			ImportResponse<List<GitHubTechniqueInfo>> response) {
 		List<ImportResponse<GitHubTechniqueInfo>> results = new ArrayList<ImportResponse<GitHubTechniqueInfo>>();
@@ -147,15 +178,18 @@ public class GitHubTechniquesSpecParser {
 				res.setStatusCode(ImportResponse.ONLY_IN_WCAG);
 				results.add(res);
 			} else {
+				if(inDbTechnique.getSha()==null)
+					inDbTechnique.setSha("dummy");
 				if (inDbTechnique.getSha().equals(tinfo.getSha())) {
 					res.setStatusCode(ImportResponse.SAME);
 				} else {
-					if (inDbTechnique.getLastModified().before(tinfo.getDate())) {
+					if (inDbTechnique.getLastModified()!=null && inDbTechnique.getLastModified().before(tinfo.getDate())) {
 						res.setStatusCode(ImportResponse.NEWER);
 					} else {
 						res.setStatusCode(ImportResponse.UNDEFINED);
 					}
 				}
+				res.setStatusCode(ImportResponse.SUCCESS);
 				res.setEntity(tinfo);
 				results.add(res);
 			}
@@ -172,39 +206,5 @@ public class GitHubTechniquesSpecParser {
 			results.add(r);
 		}
 		return results;
-	}
-
-	public static GitHubTechniqueInfo getTechniqueGitMeta(String techniquePath)
-			throws Exception {
-		// TODO: make configurable and try to guess
-		// TODO: authenticate to allow more requests.. maybe not important
-		String apiUrl = "https://api.github.com/repos/w3c/wcag/commits";
-		String branch = "Working-Branch-for-Fall-2014";
-		String since = "2014-03-28T17:18:24Z";
-		String techniquesPath = "wcag20/sources/techniques/";
-		String path = techniquesPath + techniquePath;
-		String reqUrl = apiUrl + "?" + "sha=" + branch + "&" + "since=" + since
-				+ "&path=" + path;
-		logger.debug("REST GETING from " + reqUrl);
-		ClientResponse<String> response = null;
-		GitHubTechniqueInfo gitHubInfo = null;
-		ClientRequest request = new ClientRequest(reqUrl);
-		response = request.get(String.class);
-		if (response.getStatus() != 200) {
-			response.releaseConnection();
-			logger.warn("REST Failed! " + response.getStatus());
-			if (response.getStatus() == 403) {
-				throw new RuntimeException(
-						"API rate limit exceeded. See https://developer.github.com/v3/#rate-limiting for details.");
-			} else {
-				throw new RuntimeException(new Throwable(response.getEntity()));
-			}
-
-		} else {
-			gitHubInfo = GiHubFactory
-					.createGitHubTechniqueInfoFromStringJson(response
-							.getEntity());
-		}
-		return gitHubInfo;
-	}
+	}	
 }

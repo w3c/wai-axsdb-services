@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.admin;
+package org.w3c.wai.accessdb.sync;
 
 import java.io.IOException;
 import java.util.List;
@@ -10,9 +10,6 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.w3c.wai.accessdb.om.Technique;
-import org.w3c.wai.accessdb.sync.GitHubTechniqueInfo;
-import org.w3c.wai.accessdb.sync.GitHubTechniquesSpecParser;
-import org.w3c.wai.accessdb.sync.ImportResponse;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 import org.xml.sax.SAXException;
 

@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.admin;
+package org.w3c.wai.accessdb.sync;
 
 import org.junit.Test;
 import org.w3c.wai.accessdb.sync.WCAG2SpecParser;

@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.admin;
+package org.w3c.wai.accessdb.sync;
 
 import static org.junit.Assert.assertEquals;
 

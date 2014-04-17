@@ -1,7 +1,7 @@
 package org.w3c.wai.accessdb.admin;
 
 import org.junit.Test;
-import org.w3c.wai.accessdb.parsers.WCAG2SpecParser;
+import org.w3c.wai.accessdb.sync.WCAG2SpecParser;
 
 public class TestWCAG2SpecParser {
 

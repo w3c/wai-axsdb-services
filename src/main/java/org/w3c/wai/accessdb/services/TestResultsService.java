@@ -3,12 +3,15 @@
  */
 package org.w3c.wai.accessdb.services;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,12 +32,16 @@ import org.w3c.wai.accessdb.om.User;
 import org.w3c.wai.accessdb.om.product.AssistiveTechnology;
 import org.w3c.wai.accessdb.om.product.UAgent;
 import org.w3c.wai.accessdb.om.testunit.TestUnitDescription;
+import org.w3c.wai.accessdb.sync.ExportTestResultsFile;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
+import org.w3c.wai.accessdb.utils.InOutUtils;
+import org.w3c.wai.accessdb.utils.JAXBUtils;
 
 public enum TestResultsService {
 	INSTANCE;
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestResultsService.class);
+	private String targetRootExportPath = "/tmp/accessdbexport/";
 
 	public List<TestResultViewData> loadTestResultViewData(
 			TestResultFilter filter, String techId) {
@@ -236,4 +243,40 @@ public enum TestResultsService {
 		}
 		
 	}
+	
+	public void exportAll() {
+		targetRootExportPath = ConfigService.INSTANCE
+				.getConfigParam("targetRootExportPath");
+		logger.info("Taking config param targetRootExportPath="
+				+ targetRootExportPath);
+		Date date = new Date();
+		ExportTestResultsFile indexFile = new ExportTestResultsFile();
+		indexFile.setCreated(date);
+		String exportId = "accessdbTestResultsDataExport" + date.getTime();
+		String targetExportPath = targetRootExportPath + exportId;
+		File folder = null;
+		try {
+			folder = InOutUtils.createFolder(targetExportPath);
+			logger.info("Created export folder: " + targetExportPath);
+		} catch (Exception e) {
+			logger.error("Cannot create export folder: " + targetExportPath);
+			logger.error(e.getLocalizedMessage());
+		}
+		InOutUtils.deleteFolderContents(folder);
+		List<TestResult> testResults = EAOManager.INSTANCE.getTestResultEAO().findAll();
+		indexFile.settestResults(testResults);
+		try {
+			JAXBUtils.objectToXmlFile(targetExportPath + "/testresults.xml",
+					indexFile);
+			InOutUtils.zip(new File(targetExportPath), new File(
+					targetRootExportPath + "/" + exportId + ".zip"));
+		} catch (IOException e) {
+			logger.error("Error while writing export index file");
+			logger.debug(e.getLocalizedMessage());
+		} catch (JAXBException e) {
+			logger.error("Error while writing export index file");
+			logger.debug(e.getLocalizedMessage());
+		}
+	}
+
 }

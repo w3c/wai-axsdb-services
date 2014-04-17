@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.parsers;
+package org.w3c.wai.accessdb.sync;
 
 import java.io.IOException;
 import java.io.StringReader;

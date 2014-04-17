@@ -32,6 +32,11 @@ public class Technique extends BaseEntity{
     @XmlJavaTypeAdapter(WebTechnologyAdapter.class)
 	private WebTechnology webTechnology;
 	private int status = 1;
+	private Date lastModified = null;
+	private String sha = null;
+	public Technique() {
+	}
+	
 	public int getStatus() {
 		return status;
 	}
@@ -43,18 +48,8 @@ public class Technique extends BaseEntity{
 	}
 	public void setLastModified(Date lastModified) {
 		this.lastModified = lastModified;
-	}
-	public String getGitCommitHash() {
-		return gitCommitHash;
-	}
-	public void setGitCommitHash(String gitCommitHash) {
-		this.gitCommitHash = gitCommitHash;
-	}
-	private Date lastModified = null;
-	private String gitCommitHash = null;
+	}	
 	
-	public Technique() {
-	}
 	public Technique(String nameId) {
 		this.nameId = nameId;
 	}
@@ -91,4 +86,14 @@ public class Technique extends BaseEntity{
 	public void setWebTechnology(WebTechnology webTechnology) {
 		this.webTechnology = webTechnology;
 	}
+
+	public String getSha() {
+		return sha;
+	}
+
+	public void setSha(String sha) {
+		this.sha = sha;
+	}
+
+	
 }

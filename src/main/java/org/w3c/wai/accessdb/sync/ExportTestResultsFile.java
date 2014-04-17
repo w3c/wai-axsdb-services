@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.jaxb;
+package org.w3c.wai.accessdb.sync;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -11,28 +11,29 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.utils.DateAdapter;
 
-@XmlRootElement(name="tests")
+@XmlRootElement(name="testResults")
 @XmlAccessorType(XmlAccessType.FIELD)
 
-public class ExportIndexFile{
+public class ExportTestResultsFile{
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	private Date created;
-	@XmlElementWrapper(name="tests")
-	@XmlElement(name = "test")
-	private List<String> tests = new ArrayList<String>();
+	@XmlElementWrapper(name="testResults")
+	@XmlElement(name = "testResult")
+	private List<TestResult> testResults = new ArrayList<TestResult>();
 	public Date getCreated() {
 		return created;
 	}
 	public void setCreated(Date created) {
 		this.created = created;
 	}
-	public List<String> getTests() {
-		return tests;
+	public List<TestResult> gettestResults() {
+		return testResults;
 	}
-	public void setTests(List<String> tests) {
-		this.tests = tests;
+	public void settestResults(List<TestResult> testResults) {
+		this.testResults = testResults;
 	}
-	
+	 
 }

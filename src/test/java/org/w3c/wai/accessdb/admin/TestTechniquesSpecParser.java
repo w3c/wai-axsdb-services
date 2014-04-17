@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.junit.Test;
 import org.w3c.wai.accessdb.om.Technique;
-import org.w3c.wai.accessdb.parsers.TechniquesSpecParser;
+import org.w3c.wai.accessdb.sync.TechniquesSpecParser;
 
 public class TestTechniquesSpecParser {
 

@@ -53,6 +53,7 @@ import org.w3c.wai.accessdb.utils.DateAdapter;
 @Entity
 @UniqueConstraint(columnNames = { "testUnitId" }) 
 public class TestUnitDescription extends BaseEntity{
+	// TODO: technique timestamp
 	
 
     @XmlElement(required = true)

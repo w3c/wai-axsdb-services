@@ -14,12 +14,13 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.om.Technique;
-import org.w3c.wai.accessdb.parsers.TechniquesSpecParser;
 import org.w3c.wai.accessdb.services.DBInitService;
 import org.w3c.wai.accessdb.services.TechniquesService;
 import org.w3c.wai.accessdb.services.TestingSessionService;
 import org.w3c.wai.accessdb.services.TestsService;
+import org.w3c.wai.accessdb.sync.TechniquesSpecParser;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
+import org.w3c.wai.accessdb.utils.AuthenticationException;
 
 /**
  * @author evangelos.vlachogiannis
@@ -44,11 +45,15 @@ public class AdminResource {
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response exportAllTests(@PathParam("sessionId") String sessionId) {
-		if (!TestingSessionService.INSTANCE.isAuthenticatedAsExpert(sessionId))
-        {
-            logger.info("not appropriate permission for saving a test case. Need to be expert role");
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+		try {
+			if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
+			{
+			    logger.info("not appropriate permission for saving a test case. Need to have admin role");
+			    return Response.status(Response.Status.UNAUTHORIZED).build();
+			}
+		} catch (AuthenticationException e) {
+		    return Response.status(e.getErrorStatus()).build();
+		}
         logger.info("OK you have permission.");
 		TestsService.INSTANCE.exportAllTests();
 		return Response.ok().build();
@@ -58,11 +63,15 @@ public class AdminResource {
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response doTechniquesSpecSyncFromUrl(@PathParam("sessionId") String sessionId, String url) {
-		if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
-        {
-            logger.info("not appropriate permission for doTechniquesSpecSyncFromUrl");
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        } 
+		try {
+			if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
+			{
+			    logger.info("not appropriate permission for doTechniquesSpecSyncFromUrl");
+			    return Response.status(Response.Status.UNAUTHORIZED).build();
+			}
+		} catch (AuthenticationException e) {
+		    return Response.status(e.getErrorStatus()).build();
+		}
 		url = url.trim().replace("\"", "");
         logger.info("OK you have permission.");  
         logger.info("techniques url: " + url);
@@ -79,11 +88,15 @@ public class AdminResource {
 	@DELETE
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response deleteDeepTest(@PathParam("sessionId") String sessionId, @PathParam("nameid") String nameid){
-		if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
-        {
-            logger.info("not appropriate permission for doTechniquesSpecSyncFromUrl");
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        } 
+		try {
+			if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
+			{
+			    logger.info("not appropriate permission for doTechniquesSpecSyncFromUrl");
+			    return Response.status(Response.Status.UNAUTHORIZED).build();
+			}
+		} catch (AuthenticationException e) {
+		    return Response.status(e.getErrorStatus()).build();
+		}
 		try{
 			TestsService.INSTANCE.deleteDeepTestUnitById(nameid);
 		}
@@ -121,11 +134,15 @@ public class AdminResource {
 	@DELETE
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response deleteDeepTechnique(@PathParam("sessionId") String sessionId, @PathParam("nameid") String nameid){
-		if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
-        {
-            logger.info("not appropriate permission for doTechniquesSpecSyncFromUrl");
-            return Response.status(Response.Status.UNAUTHORIZED).build();
-        }
+		try {
+			if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
+			{
+			    logger.info("not appropriate permission for doTechniquesSpecSyncFromUrl");
+			    return Response.status(Response.Status.UNAUTHORIZED).build();
+			}
+		} catch (AuthenticationException e) {
+		    return Response.status(e.getErrorStatus()).build();
+		}
 		Technique t = null;
 		try{
 			t = TechniquesService.INSTANCE.deleteTestsAndResultsByTechniqueNameId(nameid);

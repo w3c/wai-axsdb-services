@@ -21,6 +21,8 @@ import org.w3c.wai.accessdb.om.SuccessCriterio;
 import org.w3c.wai.accessdb.om.SuccessCriterioTechniqueRelation;
 import org.w3c.wai.accessdb.om.Technique;
 import org.w3c.wai.accessdb.om.WebTechnology;
+import org.w3c.wai.accessdb.sync.om.GitHubTechniqueInfo;
+import org.w3c.wai.accessdb.sync.om.ImportResponse;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;

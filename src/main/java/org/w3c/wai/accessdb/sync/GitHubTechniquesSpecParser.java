@@ -20,6 +20,8 @@ import org.w3c.dom.NodeList;
 import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.om.Technique;
 import org.w3c.wai.accessdb.om.WebTechnology;
+import org.w3c.wai.accessdb.sync.om.GitHubTechniqueInfo;
+import org.w3c.wai.accessdb.sync.om.ImportResponse;
 import org.w3c.wai.accessdb.utils.StringUtils;
 import org.xml.sax.EntityResolver;
 import org.xml.sax.InputSource;

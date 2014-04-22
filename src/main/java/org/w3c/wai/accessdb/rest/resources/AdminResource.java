@@ -32,14 +32,14 @@ public class AdminResource {
             .getLogger(AdminResource.class);
 	
 	//TODO: remove on production 
-	@Path("initdb")
+/*	@Path("initdb")
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response initDB() throws ASBPersistenceException {
         logger.info("starting init.");
 		DBInitService.INSTANCE.initAll();
 		return Response.ok().build();
-	}
+	}*/
 
 	@Path("export/{sessionId}")
 	@GET

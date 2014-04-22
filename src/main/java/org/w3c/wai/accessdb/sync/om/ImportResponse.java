@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.sync;
+package org.w3c.wai.accessdb.sync.om;
 
 import javax.xml.bind.annotation.XmlRootElement;
 /**

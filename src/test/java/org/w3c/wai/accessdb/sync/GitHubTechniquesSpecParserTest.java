@@ -10,6 +10,8 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 import org.w3c.wai.accessdb.om.Technique;
+import org.w3c.wai.accessdb.sync.om.GitHubTechniqueInfo;
+import org.w3c.wai.accessdb.sync.om.ImportResponse;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 import org.xml.sax.SAXException;
 

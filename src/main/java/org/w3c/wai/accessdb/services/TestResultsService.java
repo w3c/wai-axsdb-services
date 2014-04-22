@@ -32,7 +32,7 @@ import org.w3c.wai.accessdb.om.User;
 import org.w3c.wai.accessdb.om.product.AssistiveTechnology;
 import org.w3c.wai.accessdb.om.product.UAgent;
 import org.w3c.wai.accessdb.om.testunit.TestUnitDescription;
-import org.w3c.wai.accessdb.sync.ExportTestResultsFile;
+import org.w3c.wai.accessdb.sync.om.ExportTestResultsFile;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 import org.w3c.wai.accessdb.utils.InOutUtils;
 import org.w3c.wai.accessdb.utils.JAXBUtils;

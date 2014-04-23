@@ -4,8 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.om.User;
-import org.w3c.wai.accessdb.parsers.TechniquesSpecParser;
-import org.w3c.wai.accessdb.parsers.WCAG2SpecParser;
+import org.w3c.wai.accessdb.sync.TechniquesSpecParser;
+import org.w3c.wai.accessdb.sync.WCAG2SpecParser;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 public enum DBInitService {
 	INSTANCE;
@@ -42,7 +42,7 @@ public enum DBInitService {
 				WCAG2SpecParser.parse(XML_URL_BASE + "wcag2-src.xml");
 				//TechniquesSpecParser.parse(XML_URL_BASE + "html-tech-src.xml");
 				//TechniquesSpecParser.parse(XML_URL_BASE + "css-tech.xml");
-				TechniquesSpecParser.parse(XML_URL_BASE + "ARIA-tech-src.xml");
+				//TechniquesSpecParser.parse(XML_URL_BASE + "ARIA-tech-src.xml");
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();

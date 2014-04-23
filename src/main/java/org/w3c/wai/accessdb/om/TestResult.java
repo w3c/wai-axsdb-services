@@ -13,6 +13,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.w3c.wai.accessdb.om.base.BaseEntity;
 import org.w3c.wai.accessdb.om.testunit.TestUnitDescription;
 import org.w3c.wai.accessdb.utils.DateAdapter;
+import org.w3c.wai.accessdb.utils.TestUnitIdAdapter;
 
 /**
  * @author evangelos.vlachogiannis@fit.fraunhofer.de
@@ -28,6 +29,7 @@ public class TestResult extends BaseEntity
     private TestingProfile testingProfile;
 
     @OneToOne
+	@XmlJavaTypeAdapter(TestUnitIdAdapter.class)
     private TestUnitDescription testUnitDescription;
     
     private String httpHeaders;

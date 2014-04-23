@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.jaxb;
+package org.w3c.wai.accessdb.sync.om;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -16,7 +16,7 @@ import org.w3c.wai.accessdb.utils.DateAdapter;
 @XmlRootElement(name="tests")
 @XmlAccessorType(XmlAccessType.FIELD)
 
-public class ExportIndexFile{
+public class ExportTestFile{
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	private Date created;
 	@XmlElementWrapper(name="tests")

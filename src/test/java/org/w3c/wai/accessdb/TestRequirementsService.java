@@ -31,7 +31,7 @@ public class TestRequirementsService extends AbstractTest
 			jc = JAXBContext.newInstance(Technique.class);
 			Marshaller m = jc.createMarshaller();
 			m.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, Boolean.TRUE);
-			reqs = TechniquesService.INSTANCE.retrieveTechniques("HTML");
+			reqs = TechniquesService.INSTANCE.retrieveTechniques("ARIA");
 			//EAOManager.INSTANCE.getReqEAO().persist(reqs);
 			System.out.println(reqs.size());
 			m.marshal(reqs.get(0), System.out);

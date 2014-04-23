@@ -13,13 +13,11 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
-
-import org.w3c.wai.accessdb.om.base.BaseEntity;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlRootElement
 @XmlType(name = "", propOrder = { "testFile", "resourceFiles"})
 @Embeddable
-public class Subject extends BaseEntity{
+public class Subject {
 	@XmlElement(required = true)
 	@OneToOne(cascade=CascadeType.ALL)
 	private RefFileType testFile;

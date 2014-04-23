@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding = "UTF-8"?>
+<project default="info" basedir="."  xmlns:artifact="antlibrg.apache.maven.artifact.ant">
+    <!-- Properties file -->
+    <property file="../build.properties" />
+	
+	<path id="install.classpath">
+		<fileset dir="${install.dir}${webapp.name}/WEB-INF/lib/">
+	  		<include name="**/*.jar"/>
+		</fileset>
+        <pathelement location="${install.dir}${webapp.name}/WEB-INF/classes/"/>
+	</path>	
+	
+	<target name="deploy-all">
+		<antcall target="deploy-prepare" />
+		<!-- <antcall target="db-backup" /> -->
+		<antcall target="deploy-db" />
+		<antcall target="deploy-server" />
+	</target>
+	<!-- from server host  -->
+	<target name="db-backup">
+		<exec failonerror="false" executable="mysqldump" output="db_backup.sql"  error="">   
+				        <arg value="--user=${server.db.username}" />  
+				        <arg value="--password=${server.db.password}" />  
+				        <arg value="--host=localhost" />  
+				        <arg value="--port=3306" />  
+				        <arg value="${server.db.name}" />  
+				    </exec>  
+	</target>
+	<target name="deploy-db">
+		<echo message="Init DB" />
+		<property name="myclasspath" refid="install.classpath"/>
+	    <echo message="classpath = ${myclasspath}"/>
+		<copy overwrite="true" file="persistence.init.xml" tofile="${install.dir}${webapp.name}/WEB-INF/classes/META-INF/persistence.xml"/>
+		<sql 
+			classpathref="install.classpath"
+		    driver="com.mysql.jdbc.Driver"
+		    url="jdbc:mysql://localhost"
+		    userid="${server.db.username}"
+		    password="${server.db.password}" >
+			<transaction>DROP DATABASE IF EXISTS  ${server.db.name};</transaction>
+			<transaction>CREATE DATABASE ${server.db.name};</transaction>
+		</sql>
+		<java
+			classname="${webapp.admin.class}">
+	         <arg value="init-all"/>
+	         <classpath refid="install.classpath" />
+		</java>
+		<copy overwrite="true" file="persistence.stable.xml" tofile="${install.dir}${webapp.name}/WEB-INF/classes/META-INF/persistence.xml"/>
+			
+	</target>
+	<target name="deploy-server">
+		<copy todir="${webapps.dir}${webapp.name}" overwrite="true" includeemptydirs="true" verbose="true">
+			    <fileset dir="${install.dir}${webapp.name}">
+			      <include name="**"/>
+			    </fileset>
+			  </copy>
+	</target>
+	<target name="deploy-prepare">
+		<mkdir dir="${webapp.name}"/>
+		<unzip src="${webapp.name}.war" dest="${webapp.name}"/>
+		<chown verbose="true" type="both" owner="jetty">
+	      <fileset dir="${webapp.name}" includes="**"/>
+	    </chown>
+		<chgrp verbose="true" type="both" group="jetty">
+	      <fileset dir="${webapp.name}" includes="**"/>
+	    </chgrp>
+	</target> 
+	
+	
+	<!-- from dev host  -->
+		<target name="upload">
+			<echo message="upload install" />
+			<sshexec 
+					host="${server.host}" 
+					username="root" 
+		 			failonerror="true" 
+					keyfile="${user.home}/${local.key.file}"
+				    passphrase="${local.key.pass}"
+					command="mkdir -pv ${install.dir}"
+				/>  
+			<copy file="${local.war.dir}${webapp.name}-${webapp.version}.war" tofile="./${webapp.name}.war"/>
+			<scp trust="true"  
+				failonerror="true"
+				keyfile="${user.home}/${local.key.file}"
+				passphrase="${local.key.pass}"
+		        verbose="true"
+		        todir="${server.user}@${server.host}:${install.dir}">
+				<fileset dir=".">
+			      <include name="**"/>
+			    </fileset>
+			</scp>
+		</target> 
+	<target name="upload-classes">
+				<echo message="upload classes install" />
+				<scp trust="true"  
+					failonerror="true"
+					keyfile="${user.home}/${local.key.file}"
+					passphrase="${local.key.pass}"
+			        verbose="true"
+			        todir="${server.user}@${server.host}:${webapps.dir}${webapp.name}/WEB-INF/classes/">
+					<fileset dir="${local.war.dir}${webapp.name}-${webapp.version}/WEB-INF/classes/">
+				      <include name="**"/>
+				    </fileset>
+				</scp>
+			</target> 
+	<target name="remote-jetty-restart">
+			<echo message="jetty restart in roxie" />
+			<sshexec host="${server.host}"
+				failonerror="true"
+				username="${server.user}"
+				keyfile="${user.home}/${local.key.file}"
+				passphrase="${local.key.pass}"
+	            verbose="true"
+				command="/etc/init.d/jetty restart"/>
+		</target>
+	
+	<!-- ================================= 
+          target: info
+         ================================= -->
+    <target name="info" description="Default informative task">
+        <echo>Help for axsdb setup and admin.</echo>
+    </target>
+</project>

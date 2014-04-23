@@ -1,8 +1,8 @@
 package org.w3c.wai.accessdb.om;
 
 import javax.persistence.Basic;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.w3c.wai.accessdb.om.base.BaseEntity;
@@ -14,8 +14,8 @@ import org.w3c.wai.accessdb.om.base.BaseEntity;
  */
 @XmlRootElement
 @Entity
-@UniqueConstraint(columnNames = { "nameId" })
 public class WebTechnology extends BaseEntity {
+	@Column(unique=true)
 	private String nameId;
 	@Basic
 	private String reqSourceDoc;

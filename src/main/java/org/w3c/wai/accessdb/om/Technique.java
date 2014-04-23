@@ -1,9 +1,10 @@
 package org.w3c.wai.accessdb.om;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
-import javax.persistence.UniqueConstraint;
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -20,9 +21,9 @@ import org.w3c.wai.accessdb.utils.WebTechnologyAdapter;
 
 @XmlRootElement(name = "technique")
 @Entity
-@UniqueConstraint(columnNames = { "nameId" }) 
 @JsonIgnoreProperties({"webTechnology"})
 public class Technique extends BaseEntity{
+	@Column(unique=true)
 	private String nameId;
 	private String specRef;
 	@Column(columnDefinition="text")
@@ -30,8 +31,25 @@ public class Technique extends BaseEntity{
 	@OneToOne
     @XmlJavaTypeAdapter(WebTechnologyAdapter.class)
 	private WebTechnology webTechnology;
+	private int status = 1;
+	private Date lastModified = null;
+	private String sha = null;
 	public Technique() {
 	}
+	
+	public int getStatus() {
+		return status;
+	}
+	public void setStatus(int status) {
+		this.status = status;
+	}
+	public Date getLastModified() {
+		return lastModified;
+	}
+	public void setLastModified(Date lastModified) {
+		this.lastModified = lastModified;
+	}	
+	
 	public Technique(String nameId) {
 		this.nameId = nameId;
 	}
@@ -68,7 +86,14 @@ public class Technique extends BaseEntity{
 	public void setWebTechnology(WebTechnology webTechnology) {
 		this.webTechnology = webTechnology;
 	}
-	
-	
+
+	public String getSha() {
+		return sha;
+	}
+
+	public void setSha(String sha) {
+		this.sha = sha;
+	}
+
 	
 }

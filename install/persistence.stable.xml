@@ -33,12 +33,12 @@
 		<exclude-unlisted-classes>true</exclude-unlisted-classes>
 		<properties>
 			<property name="hibernate.connection.url"
-				value="jdbc:mysql://localhost/accessdb_dev?useUnicode=true&amp;characterEncoding=UTF-8" />
+				value="jdbc:mysql://localhost/axsdb_dev?useUnicode=true&amp;characterEncoding=UTF-8" />
 			<property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver" />
 			<property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5InnoDBDialect"></property>
 			<property name="hibernate.connection.username" value="root" />
 			<property name="hibernate.connection.password" value="" /> 
- 
+    
 <!--    			<property name="eclipselink.ddl-generation" value="drop-and-create-tables" />   -->
 <!--   			<property name="hibernate.hbm2ddl.auto" value="create-drop" />   -->
 			

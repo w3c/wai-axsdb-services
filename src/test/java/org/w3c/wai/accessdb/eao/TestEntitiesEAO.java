@@ -27,8 +27,8 @@ public class TestEntitiesEAO extends AbstractTest{
 		p.getStep().add(new Step("dfdf"));
 		p.setYesNoQuestion("dsfdsfds");
 		p.setExpectedResult(true);
-		EAOManager.INSTANCE.getObjectEAO().persist(p);
-		assertEquals(EAOManager.INSTANCE.getObjectEAO().findAll().size(),1);
+	//	EAOManager.INSTANCE.getObjectEAO().persist(p);
+	//	assertEquals(EAOManager.INSTANCE.getObjectEAO().findAll().size(),1);
 		
 	}
 	

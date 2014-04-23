@@ -1,4 +1,4 @@
-package org.w3c.wai.accessdb.parsers;
+package org.w3c.wai.accessdb.sync;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;

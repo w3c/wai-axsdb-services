@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
+import javax.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.eao.EAOManager;
@@ -14,6 +16,7 @@ import org.w3c.wai.accessdb.jaxb.TestResultSimple;
 import org.w3c.wai.accessdb.jaxb.TestingSession;
 import org.w3c.wai.accessdb.om.User;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
+import org.w3c.wai.accessdb.utils.AuthenticationException;
 
 public enum TestingSessionService {
 	INSTANCE;
@@ -78,16 +81,17 @@ public enum TestingSessionService {
 		return false;
 	}
 	
-	public boolean isAuthenticatedAsExpert(String sessionid) {		
+	public boolean isAuthenticatedAsExpert(String sessionid) throws AuthenticationException {		
 		return AuthenicateService.isAuthenticatedAsExpert(this.getUser(sessionid));
     }
-	public boolean isAuthenticatedAsAdmin(String sessionid) {
+	public boolean isAuthenticatedAsAdmin(String sessionid) throws AuthenticationException {
 		return AuthenicateService.isAuthenticatedAsAdmin(this.getUser(sessionid));
     }
-	public User getUser(String sessionid) { 
+	public User getUser(String sessionid) throws AuthenticationException { 
 		if (this.authenicatedSessions.containsKey(sessionid))
 			return this.authenicatedSessions.get(sessionid);
-		return null;
+		else
+			throw new AuthenticationException(Response.Status.UNAUTHORIZED);
 	}
 
 	public TestingSession login(LoginData lData) throws ASBPersistenceException {

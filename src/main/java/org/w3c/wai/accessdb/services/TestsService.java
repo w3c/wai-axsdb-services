@@ -23,7 +23,6 @@ import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.eao.TestUnitDescriptionEAO;
 import org.w3c.wai.accessdb.helpers.TestResultFilterHelper;
 import org.w3c.wai.accessdb.helpers.TestUnitHelper;
-import org.w3c.wai.accessdb.jaxb.ExportIndexFile;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
 import org.w3c.wai.accessdb.jaxb.TreeNodeData;
 import org.w3c.wai.accessdb.om.Technique;
@@ -33,6 +32,7 @@ import org.w3c.wai.accessdb.om.testunit.Step;
 import org.w3c.wai.accessdb.om.testunit.Subject;
 import org.w3c.wai.accessdb.om.testunit.TestProcedure;
 import org.w3c.wai.accessdb.om.testunit.TestUnitDescription;
+import org.w3c.wai.accessdb.sync.om.ExportTestFile;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 import org.w3c.wai.accessdb.utils.InOutUtils;
 import org.w3c.wai.accessdb.utils.JAXBUtils;
@@ -48,7 +48,7 @@ public enum TestsService {
 	INSTANCE;
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestsService.class);
-	private TestUnitDescriptionEAO eao = new TestUnitDescriptionEAO();
+	private TestUnitDescriptionEAO eao = EAOManager.INSTANCE.getTestUnitDescriptionEAO();
 	private String targetRootExportPath = "/tmp/accessdbexport/";
 	private String sourceExportTestFilesPath = "/var/www/testfiles";
 
@@ -149,9 +149,7 @@ public enum TestsService {
 			}
 			s.getResourceFiles().clear();
 		}
-		p = (TestProcedure) EAOManager.INSTANCE.getObjectEAO().persist(p);
 		testUnitDescription.setTestProcedure(p);
-		s = (Subject) EAOManager.INSTANCE.getObjectEAO().persist(s);
 		testUnitDescription.setSubject(s);
 		return eao.persist(testUnitDescription);
 	}
@@ -275,9 +273,9 @@ public enum TestsService {
 	public boolean importTests(String indexFilePath, boolean newIds)
 			throws ASBPersistenceException {
 		File indexF = new File(indexFilePath);
-		ExportIndexFile indexFile = new ExportIndexFile();
-		indexFile = (ExportIndexFile) JAXBUtils.fileToObject(indexF,
-				ExportIndexFile.class);
+		ExportTestFile indexFile = new ExportTestFile();
+		indexFile = (ExportTestFile) JAXBUtils.fileToObject(indexF,
+				ExportTestFile.class);
 		if (indexFile == null) {
 			logger.error("Cannot load index file for importing");
 			return false;
@@ -319,8 +317,6 @@ public enum TestsService {
 	public TestUnitDescription prepareTestMeta(TestUnitDescription tu) {
 		// prepare meta for new database
 		tu.setId(-1);
-		tu.getSubject().setId(-1);
-		tu.getTestProcedure().setId(-1);
 		String techniqueN = tu.getTechnique().getNameId();
 		Technique technique = EAOManager.INSTANCE.getTechniqueEAO()
 				.findByNameId(techniqueN);
@@ -357,7 +353,7 @@ public enum TestsService {
 		logger.info("Taking config param sourceExportTestFilesPath="
 				+ sourceExportTestFilesPath);
 		Date date = new Date();
-		ExportIndexFile indexFile = new ExportIndexFile();
+		ExportTestFile indexFile = new ExportTestFile();
 		indexFile.setCreated(date);
 		String exportId = "accessdbDataExport" + date.getTime();
 		String targetExportPath = targetRootExportPath + exportId;

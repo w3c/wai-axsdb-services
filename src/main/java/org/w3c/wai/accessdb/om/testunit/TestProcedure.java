@@ -15,8 +15,6 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
-import org.w3c.wai.accessdb.om.base.BaseEntity;
-
 /**
  * <p>Java class for anonymous complex type.
  * 
@@ -46,7 +44,7 @@ import org.w3c.wai.accessdb.om.base.BaseEntity;
     "expectedResult"
 })
 @Embeddable
-public class TestProcedure extends BaseEntity {
+public class TestProcedure{
 
 	@OneToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL)	
 	@OrderBy("id ASC")

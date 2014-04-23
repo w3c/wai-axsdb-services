@@ -11,11 +11,15 @@ Install
 ==========
 
 mvn -Dmaven.test.skip=true install
+
 cp build.default.properties ../build.properties
+
 edit build.properties
+
 ant upload
 
 Login to your server and install dir:
+
 
 ant deploy-all
 server restart

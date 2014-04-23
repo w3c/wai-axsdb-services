@@ -9,6 +9,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,6 +49,10 @@ public class AdminTechniquesResource {
 		try {
 			ImportResponse<List<GitHubTechniqueInfo>> allInGit = GitHubTechniquesSpecParser
 					.prepareImport(url);
+			if(allInGit.getStatusCode() != ImportResponse.OK){
+				logger.debug("ImportResponse REST failed");
+				return Response.status(allInGit.getStatusCode()).build();
+			}
 			logger.debug("all : " + allInGit.getEntity().size());
 			List<ImportResponse<GitHubTechniqueInfo>> filtered = GitHubTechniquesSpecParser
 					.filterTechniques(allInGit);
@@ -78,7 +83,7 @@ public class AdminTechniquesResource {
 			logger.debug("techniques url: " + toImport.size());
 			if(toImport.size()>0){
 				List<ImportResponse<Technique>> rs = GitHubTechniquesSpecParser.importTechniques(toImport);
-				return Response.ok(rs).build();
+				return Response.status(Status.CREATED).entity(rs).build();
 			}
 			else{
 				return Response.noContent().build();

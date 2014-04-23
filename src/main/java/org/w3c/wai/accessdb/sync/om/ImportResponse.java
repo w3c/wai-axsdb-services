@@ -8,17 +8,17 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement
 public class ImportResponse<T>{
-	public static int UNDEFINED = -1;
+	public static int NOTDEFINED = -1;
 	public static int SAME = 100;
 	public static int ONLY_IN_WCAG = 101;
 	public static int ONLY_IN_DB = 102;
 	public static int NEWER = 201;
 	public static int OLDER = 202;
-	public static int SUCCESS = 301;
+	public static int OK = 200;
 	public static int FAIL = 302;
 
 	private T entity;
-	private int statusCode = UNDEFINED;
+	private int statusCode = NOTDEFINED;
 	
 	public int getStatusCode() {
 		return statusCode;

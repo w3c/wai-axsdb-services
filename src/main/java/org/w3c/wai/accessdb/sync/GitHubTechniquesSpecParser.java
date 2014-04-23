@@ -101,8 +101,9 @@ public class GitHubTechniquesSpecParser {
 				infos.add(info);
 			}
 			result.setEntity(infos);
-			result.setStatusCode(ImportResponse.SUCCESS);
+			result.setStatusCode(ImportResponse.OK);
 		} catch (Exception e) {
+			logger.warn(e.getLocalizedMessage());
 			result.setEntity(infos);
 			result.setStatusCode(ImportResponse.FAIL);
 		}
@@ -135,6 +136,7 @@ public class GitHubTechniquesSpecParser {
 			}
 
 		} else {
+			logger.debug("REST successfully");
 			gitHubInfo = GitHubFactory
 					.createGitHubTechniqueInfoFromStringJson(response
 							.getEntity());
@@ -148,25 +150,18 @@ public class GitHubTechniquesSpecParser {
 			return results;
 		WebTechnology webTechnology = response.getEntity().get(0)
 				.getWebTechnology();
+		
+		// for every technique in DB 
 		List<Technique> allWebTechTechniques = EAOManager.INSTANCE
 				.getTechniqueEAO().findByWebTechNameId(
 						webTechnology.getNameId());
-		for (Technique technique : allWebTechTechniques) {
-			String nameId = technique.getNameId();
-			boolean found = false;
-			for (GitHubTechniqueInfo tinfo : response.getEntity()) {
-				if (nameId.equalsIgnoreCase(tinfo.getTechnique())) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
+		for (Technique techniqueInDb : allWebTechTechniques) {
+			GitHubTechniqueInfo tmpInfo = new GitHubTechniqueInfo(techniqueInDb.getNameId());
+			if(!response.getEntity().contains(tmpInfo)){
 				ImportResponse<GitHubTechniqueInfo> res = new ImportResponse<GitHubTechniqueInfo>();
 				res.setStatusCode(ImportResponse.ONLY_IN_DB);
-				GitHubTechniqueInfo info = new GitHubTechniqueInfo();
-				info.setTechnique(nameId);
-				info.setWebTechnology(webTechnology);
-				res.setEntity(info);
+				tmpInfo.setWebTechnology(webTechnology);
+				res.setEntity(tmpInfo);
 				results.add(res);
 			}
 		}
@@ -188,10 +183,10 @@ public class GitHubTechniquesSpecParser {
 					if (inDbTechnique.getLastModified()!=null && inDbTechnique.getLastModified().before(tinfo.getDate())) {
 						res.setStatusCode(ImportResponse.NEWER);
 					} else {
-						res.setStatusCode(ImportResponse.UNDEFINED);
+						res.setStatusCode(ImportResponse.NOTDEFINED);
 					}
 				}
-				res.setStatusCode(ImportResponse.SUCCESS);
+				res.setStatusCode(ImportResponse.OK);
 				res.setEntity(tinfo);
 				results.add(res);
 			}

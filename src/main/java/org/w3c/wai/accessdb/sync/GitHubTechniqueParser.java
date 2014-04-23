@@ -36,7 +36,6 @@ public class GitHubTechniqueParser {
 		ImportResponse<Technique> result = new ImportResponse<Technique>();
 		Technique technique = null;
 		try {
-
 			String url = tinfo.getUrl();
 			String webTechnologyNameId = tinfo.getWebTechnology().getNameId();
 			WebTechnology webTechnology = EAOManager.INSTANCE
@@ -123,7 +122,7 @@ public class GitHubTechniqueParser {
 				} else
 					logger.error("sc not found!!! : " + idRef);
 				result.setEntity(technique);
-				result.setStatusCode(ImportResponse.SUCCESS);
+				result.setStatusCode(ImportResponse.OK);
 			}
 		} catch (Exception e) {
 			result.setEntity(technique);

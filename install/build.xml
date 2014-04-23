@@ -1,80 +1,63 @@
 <?xml version="1.0" encoding = "UTF-8"?>
 <project default="info" basedir="."  xmlns:artifact="antlibrg.apache.maven.artifact.ant">
     <!-- Properties file -->
-    <property file="install.properties" />
-	<path id="local.classpath">
-		<fileset dir="${local.war.folder}/WEB-INF/lib/">
+    <property file="../build.properties" />
+	
+	<path id="install.classpath">
+		<fileset dir="${install.dir}${webapp.name}/WEB-INF/lib/">
 	  		<include name="**/*.jar"/>
 		</fileset>
-        <pathelement location="${local.war.folder}/WEB-INF/classes/"/>
-	</path>
+        <pathelement location="${install.dir}${webapp.name}/WEB-INF/classes/"/>
+	</path>	
 	
-	
-	<!-- local................................... -->
-
-	<target name="local-db-populate">
+	<target name="deploy-all">
+		<antcall target="deploy-prepare" />
+		<!-- <antcall target="db-backup" /> -->
+		<antcall target="deploy-db" />
+		<antcall target="deploy-server" />
+	</target>
+	<!-- from server host  -->
+	<target name="db-backup">
+		<exec failonerror="false" executable="mysqldump" output="db_backup.sql"  error="">   
+				        <arg value="--user=${server.db.username}" />  
+				        <arg value="--password=${server.db.password}" />  
+				        <arg value="--host=localhost" />  
+				        <arg value="--port=3306" />  
+				        <arg value="${server.db.name}" />  
+				    </exec>  
+	</target>
+	<target name="deploy-db">
 		<echo message="Init DB" />
-		<property name="myclasspath" refid="local.classpath"/>
-	    <echo message="Classpath = ${myclasspath}"/>
-		<copy overwrite="true" file="persistence.init.xml" tofile="${local.war.folder}/WEB-INF/classes/META-INF/persistence.xml"/>
-		<exec failonerror="false" executable="mysqldump" output="db_backup.sql" error="">  
-		        <arg value="--user=root" />  
-		        <arg value="--password=" />  
-		        <arg value="--host=localhost" />  
-		        <arg value="--port=3306" />  
-		        <arg value="${db.name}" />  
-		    </exec>  
+		<property name="myclasspath" refid="install.classpath"/>
+	    <echo message="classpath = ${myclasspath}"/>
+		<copy overwrite="true" file="persistence.init.xml" tofile="${install.dir}${webapp.name}/WEB-INF/classes/META-INF/persistence.xml"/>
 		<sql 
-			classpathref="local.classpath"
+			classpathref="install.classpath"
 		    driver="com.mysql.jdbc.Driver"
 		    url="jdbc:mysql://localhost"
-		    userid="${db.username}"
-		    password="${db.password}" >
-			<transaction>DROP DATABASE IF EXISTS  ${db.name};</transaction>
-			<transaction>CREATE DATABASE ${db.name};</transaction>
+		    userid="${server.db.username}"
+		    password="${server.db.password}" >
+			<transaction>DROP DATABASE IF EXISTS  ${server.db.name};</transaction>
+			<transaction>CREATE DATABASE ${server.db.name};</transaction>
 		</sql>
 		<java
 			classname="${webapp.admin.class}">
 	         <arg value="init-all"/>
-	         <classpath refid="local.classpath" />
+	         <classpath refid="install.classpath" />
 		</java>
-		<copy overwrite="true" file="persistence.stable.xml" tofile="${local.war.folder}/WEB-INF/classes/META-INF/persistence.xml"/>
-		<copy todir="/var/lib/jetty/webapps/" overwrite="true" includeemptydirs="true" verbose="true">
-		    <fileset dir="${local.war.folder}">
-		      <exclude name="**"/>
-		    </fileset>
-		  </copy>
-		
+		<copy overwrite="true" file="persistence.stable.xml" tofile="${install.dir}${webapp.name}/WEB-INF/classes/META-INF/persistence.xml"/>
+			
 	</target>
-	
-	
-	
-	<!-- upload and then run from remote host  -->
-	<target name="upload">
-				<echo message="upload install" />
-				<sshexec 
-						host="${remote.host}" 
-						username="root" 
-			 			failonerror="true" 
-						keyfile="${user.home}/${local.key.file}"
-					    passphrase="${local.key.pass}"
-						command="mkdir -pv ${install.dir}"
-					/>  
-				<move file="../target/${local.war.filename}" tofile="./${remote.war.filename}"/>
-				<scp trust="true"  
-					failonerror="true"
-					keyfile="${user.home}/${local.key.file}"
-					passphrase="${local.key.pass}"
-		            verbose="true"
-		            todir="${remote.user}@${remote.host}:${install.dir}">
-					<fileset dir=".">
-				      <include name="*"/>
-				    </fileset>
-				</scp>
-	</target> 
-	<target name="deploy">
+	<target name="deploy-server">
+		<copy todir="${webapps.dir}${webapp.name}" overwrite="true" includeemptydirs="true" verbose="true">
+			    <fileset dir="${install.dir}${webapp.name}">
+			      <include name="**"/>
+			    </fileset>
+			  </copy>
+	</target>
+	<target name="deploy-prepare">
 		<mkdir dir="${webapp.name}"/>
-		<unzip src="${remote.war.filename}" dest="${webapp.name}"/>
+		<unzip src="${webapp.name}.war" dest="${webapp.name}"/>
 		<chown verbose="true" type="both" owner="jetty">
 	      <fileset dir="${webapp.name}" includes="**"/>
 	    </chown>
@@ -84,36 +67,53 @@
 	</target> 
 	
 	
-	<!-- remote................................... -->
-	
-	<path id="remote.classpath">
-			<fileset dir="${remote.war.folder}/WEB-INF/lib/">
-		  		<include name="**/*.jar"/>
-			</fileset>
-	        <pathelement location="${remote.war.folder}/WEB-INF/classes/"/>
-		</path>
+	<!-- from dev host  -->
+		<target name="upload">
+			<echo message="upload install" />
+			<sshexec 
+					host="${server.host}" 
+					username="root" 
+		 			failonerror="true" 
+					keyfile="${user.home}/${local.key.file}"
+				    passphrase="${local.key.pass}"
+					command="mkdir -pv ${install.dir}"
+				/>  
+			<copy file="${local.war.dir}${webapp.name}-${webapp.version}.war" tofile="./${webapp.name}.war"/>
+			<scp trust="true"  
+				failonerror="true"
+				keyfile="${user.home}/${local.key.file}"
+				passphrase="${local.key.pass}"
+		        verbose="true"
+		        todir="${server.user}@${server.host}:${install.dir}">
+				<fileset dir=".">
+			      <include name="**"/>
+			    </fileset>
+			</scp>
+		</target> 
+	<target name="upload-classes">
+				<echo message="upload classes install" />
+				<scp trust="true"  
+					failonerror="true"
+					keyfile="${user.home}/${local.key.file}"
+					passphrase="${local.key.pass}"
+			        verbose="true"
+			        todir="${server.user}@${server.host}:${webapps.dir}${webapp.name}/WEB-INF/classes/">
+					<fileset dir="${local.war.dir}${webapp.name}-${webapp.version}/WEB-INF/classes/">
+				      <include name="**"/>
+				    </fileset>
+				</scp>
+			</target> 
 	<target name="remote-jetty-restart">
-		<echo message="jetty restart in roxie" />
-		<sshexec host="${remote.host}"
-			failonerror="true"
-			keyfile="${user.home}/${local.key.file}"
-			passphrase="${local.key.pass}"
-            verbose="true"
-			command="/etc/init.d/jetty restart"/>
-	</target>
-	<target name="remote-db-populate">
-		<echo message="polulate db in roxie" />
-		<property name="myclasspath" refid="remote.classpath"/>
-		<echo message="Classpath = ${myclasspath}"/>
-		<property name="remote.classes" location="${remote.war.folder}/WEB-INF/classes/"/>
-		<sshexec host="${remote.user}@${remote.host}:${remote.classes}"
-			failonerror="true"
-			keyfile="${user.home}/${local.key.file}"
-			passphrase="${local.key.pass}"
-            verbose="true"
-			command="java -c ${remote.classpath} ${webapp.admin.class} init-all"/>
-	</target>
-		
+			<echo message="jetty restart in roxie" />
+			<sshexec host="${server.host}"
+				failonerror="true"
+				username="${server.user}"
+				keyfile="${user.home}/${local.key.file}"
+				passphrase="${local.key.pass}"
+	            verbose="true"
+				command="/etc/init.d/jetty restart"/>
+		</target>
+	
 	<!-- ================================= 
           target: info
          ================================= -->

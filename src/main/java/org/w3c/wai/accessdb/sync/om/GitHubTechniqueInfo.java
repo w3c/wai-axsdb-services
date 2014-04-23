@@ -7,13 +7,20 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.w3c.wai.accessdb.om.WebTechnology;
 
 @XmlRootElement
-public class GitHubTechniqueInfo {
+public class GitHubTechniqueInfo implements Comparable<GitHubTechniqueInfo>{
 	private String technique = null;
 	private WebTechnology webTechnology = null;
 	private String sha = null;
 	private Date date = null;
 	private String diffUrl = null;
 	private String url = null;
+
+	public GitHubTechniqueInfo(String technique) {
+		this.technique = technique;
+	}
+	public GitHubTechniqueInfo() {
+		
+	}
 
 	public String getTechnique() {
 		return technique;
@@ -67,6 +74,21 @@ public class GitHubTechniqueInfo {
 	public String toString() {
 		return this.technique + " " + this.webTechnology.getNameId() + " "
 				+ this.getUrl() + " " + this.getSha();
+	}
+
+	@Override
+	public int compareTo(GitHubTechniqueInfo o) {
+		return o.getTechnique().compareTo(this.getTechnique());
+	}
+	@Override
+	public boolean equals(Object obj) {
+		try{
+			GitHubTechniqueInfo i = (GitHubTechniqueInfo) obj;
+			return this.getTechnique().equals(i.getTechnique());
+		}
+		catch(Exception e){
+			return super.equals(obj);
+		}
 	}
 
 }

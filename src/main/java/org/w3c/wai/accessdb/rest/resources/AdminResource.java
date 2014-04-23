@@ -14,12 +14,10 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.om.Technique;
-import org.w3c.wai.accessdb.services.DBInitService;
 import org.w3c.wai.accessdb.services.TechniquesService;
 import org.w3c.wai.accessdb.services.TestingSessionService;
 import org.w3c.wai.accessdb.services.TestsService;
 import org.w3c.wai.accessdb.sync.TechniquesSpecParser;
-import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 import org.w3c.wai.accessdb.utils.AuthenticationException;
 
 /**

@@ -24,9 +24,8 @@ Project page: http://www.w3.org/WAI/ACT/
 
 ## Deploy
 
-+ apache ant
-
 ### Prerequisites 
++ apache ant
 
 ### Process 
 

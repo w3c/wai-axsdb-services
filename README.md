@@ -1,31 +1,52 @@
-wai-axsdb-services
-=========
-
-Accessibility Support Database Backend
+# Accessibility Support Database Services
 
 This is the server side of the Accessibility Support Database offering CRUD REST Services to the front end.
-
 Project page: http://www.w3.org/WAI/ACT/
 
-Install
-==========
-
-mvn -Dmaven.test.skip=true install
-
-cp build.default.properties ../build.properties
-
-edit build.properties
-
-ant upload
-
-Login to your server and install dir:
+## Key Technologies
++ JAVA
++ JPA
++ Hibernate
++ Mysql
++ RestEasy
 
 
-ant deploy-all
-server restart
-Apache proxy config if required and restart 
+## Build
 
-TODO:
-test files folder
-log folder
-config files
+### Prerequisites 
++ JKD 1.6+ (1.7+ recommended)
++ apache maven 2+
+
+
+### Process 
+
++ mvn -Dmaven.test.skip=true install
+
+## Deploy
+
++ apache ant
+
+### Prerequisites 
+
+### Process 
+
++ cp build.default.properties ../build.properties
++ edit build.properties
++ ant upload
++ ssh serverHost 
++ cd install.dir
++ ant deploy-all
++ java container restart
++ Apache proxy config if required 
++ Apache restart 
+
+### TODO
+
++ create test files folder
++ create log folder
++ config files
+
+## API
+
+To document
+

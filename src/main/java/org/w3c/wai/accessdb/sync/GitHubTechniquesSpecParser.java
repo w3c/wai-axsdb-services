@@ -186,7 +186,6 @@ public class GitHubTechniquesSpecParser {
 						res.setStatusCode(ImportResponse.NOTDEFINED);
 					}
 				}
-				res.setStatusCode(ImportResponse.OK);
 				res.setEntity(tinfo);
 				results.add(res);
 			}

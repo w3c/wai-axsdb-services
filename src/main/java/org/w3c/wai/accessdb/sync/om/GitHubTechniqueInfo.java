@@ -72,7 +72,7 @@ public class GitHubTechniqueInfo implements Comparable<GitHubTechniqueInfo>{
 
 	@Override
 	public String toString() {
-		return this.technique + " " + this.webTechnology.getNameId() + " "
+		return this.technique + " "
 				+ this.getUrl() + " " + this.getSha();
 	}
 

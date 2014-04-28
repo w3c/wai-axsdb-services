@@ -10,8 +10,6 @@ import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.apache.commons.io.FilenameUtils;
-import org.jboss.resteasy.client.ClientRequest;
-import org.jboss.resteasy.client.ClientResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -40,10 +38,12 @@ public class GitHubTechniquesSpecParser {
 	 * 
 	 * @param urlS
 	 * @return
+	 * @throws IOException 
 	 */
 	public static ImportResponse<List<GitHubTechniqueInfo>> prepareImport(
-			String urlS) {
+			String urlS) throws IOException {
 		String branch = urlS.split("/")[5];
+		GitHubService.INSTANCE.init(branch);
 		ImportResponse<List<GitHubTechniqueInfo>> result = new ImportResponse<List<GitHubTechniqueInfo>>();
 		List<GitHubTechniqueInfo> infos = new ArrayList<GitHubTechniqueInfo>();
 		try {
@@ -93,11 +93,10 @@ public class GitHubTechniquesSpecParser {
 				String href = e.getAttribute("href");
 				fullHref = parentPath + "/" + href;
 				logger.debug("for technique url: " + href);
-				GitHubTechniqueInfo info = getTechniqueGitMeta(href,branch);
+				GitHubTechniqueInfo info = GitHubService.INSTANCE.getTechniqueGitMeta(href);
 				info.setUrl(fullHref);
 				info.setTechnique(FilenameUtils.getBaseName(href));
 				info.setWebTechnology(webTechnology);
-				info.setDiffUrl(fullHref);// TODO: use diff url if possible
 				infos.add(info);
 			}
 			result.setEntity(infos);
@@ -109,40 +108,7 @@ public class GitHubTechniquesSpecParser {
 		}
 		return result;
 	}
-	public static GitHubTechniqueInfo getTechniqueGitMeta(String techniquePath, String branch)
-			throws Exception {
-		// TODO: make configurable and try to guess
-		// TODO: authenticate to allow more requests.. maybe not important
-		String apiUrl = "https://api.github.com/repos/w3c/wcag/commits";
-		//String branch = "Working-Branch-for-Fall-2014";
-		logger.debug("using branch: " + branch);
-		//branch from url
-		String techniquesPath = "wcag20/sources/techniques/";
-		String path = techniquesPath + techniquePath;
-		String reqUrl = apiUrl + "?" + "sha=" + branch + "&path=" + path;
-		logger.debug("REST GETING from " + reqUrl);
-		ClientResponse<String> response = null;
-		GitHubTechniqueInfo gitHubInfo = null;
-		ClientRequest request = new ClientRequest(reqUrl);
-		response = request.get(String.class);
-		if (response.getStatus() != 200) {
-			response.releaseConnection();
-			logger.warn("REST Failed! " + response.getStatus());
-			if (response.getStatus() == 403) {
-				throw new RuntimeException(
-						"API rate limit exceeded. See https://developer.github.com/v3/#rate-limiting for details.");
-			} else {
-				throw new RuntimeException(new Throwable(response.getEntity()));
-			}
-
-		} else {
-			logger.debug("REST successfully");
-			gitHubInfo = GitHubFactory
-					.createGitHubTechniqueInfoFromStringJson(response
-							.getEntity());
-		}
-		return gitHubInfo;
-	}
+	
 	public static List<ImportResponse<GitHubTechniqueInfo>> filterTechniques(
 			ImportResponse<List<GitHubTechniqueInfo>> response) {
 		List<ImportResponse<GitHubTechniqueInfo>> results = new ArrayList<ImportResponse<GitHubTechniqueInfo>>();
@@ -150,7 +116,6 @@ public class GitHubTechniquesSpecParser {
 			return results;
 		WebTechnology webTechnology = response.getEntity().get(0)
 				.getWebTechnology();
-		
 		// for every technique in DB 
 		List<Technique> allWebTechTechniques = EAOManager.INSTANCE
 				.getTechniqueEAO().findByWebTechNameId(

@@ -53,6 +53,13 @@ public enum ConfigService {
 		this.configDefault.put(LDAP_BASE, "ou=people,dc=w3,dc=org");
 		this.configDefault.put(USER_ROLE_AXSDBCOL_CODE, "69096");
 		this.configDefault.put(USER_ROLE_AXSDBADM_CODE, "69097");
+
+		this.configDefault.put("github.username", "69097");
+		this.configDefault.put("github.password", "69097");
+		this.configDefault.put("github.techniquesBasePath", "69097");
+		this.configDefault.put("github.branchNameDefault", "69097");
+
+		
 		String path = "/etc/accessdb/";
 		try {
 			// load a properties file

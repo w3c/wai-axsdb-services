@@ -257,5 +257,16 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>1.7.5</version>
 		</dependency>
+		<dependency>
+		  <groupId>org.eclipse.mylyn.github</groupId>
+		  <artifactId>org.eclipse.egit.github.core</artifactId>
+		  <version>2.1.5</version>
+		</dependency> 
 	</dependencies>
+	<repositories>
+		<repository>
+		    <id>java.net</id>
+		    <url>http://download.java.net/maven/2/</url>
+		</repository>
+	</repositories>
 </project>

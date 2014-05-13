@@ -39,13 +39,22 @@ Project page: http://www.w3.org/WAI/ACT/
 + Apache proxy config if required 
 + Apache restart 
 
-### TODO
+## REST API
+
+AccessDB offers a number of open Interfaces through REST interfaces. In summary the current interfaces with accompanies appropriate methods are: 
+
++ TestingSession: Provides functionality for managing a user AccessDB session like login, logout etc. 
++ Testunit: Provides functionality for managing the test cases like saving new, editing etc.
++ Requirement: Provides functionality for getting information about testing requirements including WCAG Principles Guidelines, Success Criteria, HTML techniques, CSS techniques etc.
++ Profile: Provides functionality for managing the Testing Profiles
++ Testresult: Provides functionality for managing the Test Results
++ Query: Provides a way of read only querying the database from the client using HQL
++ Rating: Provides functionality for managing any rating (test case or test result)
+
+In addition there is also a developer workbench for allowing developers to experiment with the data and the API functionality. 
+
+## TODO
 
 + create test files folder
 + create log folder
 + config files
-
-## API
-
-To document
-

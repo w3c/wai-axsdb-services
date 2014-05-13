@@ -168,12 +168,15 @@ public enum TestResultsService {
 											namedId)).get(0));
 			res.setNoOfAll(noOfAll);
 			res.setNoOfPass(noOfPass);
+			res.setTechniqueTitle(technique.getTitle());
+			/*
 			res.setNoOfUniqueCombinations(EAOManager.INSTANCE
 					.getTestResultEAO().countUniqueATCombinationsByTechnique(
 							namedId));
 			res.setNoOfUniqueContributors(EAOManager.INSTANCE
 					.getTestResultEAO().countUniqueContributorsByTechnique(
 							namedId));
+							*/
 			results.add(res);
 			logger.debug(res.toString());
 		}

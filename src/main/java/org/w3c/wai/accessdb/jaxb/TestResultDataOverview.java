@@ -6,14 +6,10 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class TestResultDataOverview
 {
     private String technique = "undefined";
-
+    private String techniqueTitle = null;
     private String noOfPass = "undefined";
-
     private String noOfAll = "undefined";
 
-    private String noOfUniqueCombinations = "undefined";
-
-    private String noOfUniqueContributors = "undefined";
 
     public String getTechnique()
     {
@@ -45,30 +41,18 @@ public class TestResultDataOverview
         this.noOfAll = noOfAll;
     }
 
-    public String getNoOfUniqueCombinations()
-    {
-        return noOfUniqueCombinations;
-    }
-
-    public void setNoOfUniqueCombinations(String noOfUniqueCombinations)
-    {
-        this.noOfUniqueCombinations = noOfUniqueCombinations;
-    }
-
-    public String getNoOfUniqueContributors()
-    {
-        return noOfUniqueContributors;
-    }
-
-    public void setNoOfUniqueContributors(String noOfUniqueContributors)
-    {
-        this.noOfUniqueContributors = noOfUniqueContributors;
-    }
     @Override
     public String toString()
     {
-        // TODO Auto-generated method stub
-        return this.technique + " / " +  this.noOfAll + " / " +  this.noOfPass + " / " +  this.noOfUniqueCombinations + " / " + this.noOfUniqueContributors;
+        return this.technique + " / " +  this.noOfAll + " / " +  this.noOfPass + " / ";
     }
+
+	public String getTechniqueTitle() {
+		return techniqueTitle;
+	}
+
+	public void setTechniqueTitle(String techniqueTitle) {
+		this.techniqueTitle = techniqueTitle;
+	}
     
 }

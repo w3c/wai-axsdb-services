@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.utils.DateAdapter;
 import org.w3c.wai.accessdb.utils.JAXBUtils;
-@XmlRootElement
+@XmlRootElement 
 public class TestResultViewData
 {
     public TestResultViewData()

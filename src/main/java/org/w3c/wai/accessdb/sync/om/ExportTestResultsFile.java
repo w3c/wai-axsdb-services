@@ -11,29 +11,30 @@ import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.w3c.wai.accessdb.om.TestResult;
+import org.w3c.wai.accessdb.om.TestResultsBunch;
 import org.w3c.wai.accessdb.utils.DateAdapter;
 
-@XmlRootElement(name="testResults")
+@XmlRootElement(name="ExportTestResultsFile")
 @XmlAccessorType(XmlAccessType.FIELD)
 
 public class ExportTestResultsFile{
 	@XmlJavaTypeAdapter(DateAdapter.class)
+	@XmlElement(name = "exportDate")
 	private Date created;
-	@XmlElementWrapper(name="testResults")
-	@XmlElement(name = "testResult")
-	private List<TestResult> testResults = new ArrayList<TestResult>();
+	@XmlElementWrapper(name="bunchs")
+	@XmlElement(name = "bunch")
+	private List<TestResultsBunch> testResultsBunch = new ArrayList<TestResultsBunch>();
 	public Date getCreated() {
 		return created;
 	}
 	public void setCreated(Date created) {
 		this.created = created;
 	}
-	public List<TestResult> gettestResults() {
-		return testResults;
+	public List<TestResultsBunch> getTestResultsBunch() {
+		return testResultsBunch;
 	}
-	public void settestResults(List<TestResult> testResults) {
-		this.testResults = testResults;
+	public void setTestResultsBunch(List<TestResultsBunch> testResultsBunch) {
+		testResultsBunch = testResultsBunch;
 	}
-	 
+	
 }

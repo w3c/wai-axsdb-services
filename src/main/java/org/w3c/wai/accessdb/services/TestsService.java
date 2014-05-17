@@ -26,7 +26,6 @@ import org.w3c.wai.accessdb.helpers.TestUnitHelper;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
 import org.w3c.wai.accessdb.jaxb.TreeNodeData;
 import org.w3c.wai.accessdb.om.Technique;
-import org.w3c.wai.accessdb.om.WebTechnology;
 import org.w3c.wai.accessdb.om.testunit.RefFileType;
 import org.w3c.wai.accessdb.om.testunit.Step;
 import org.w3c.wai.accessdb.om.testunit.Subject;
@@ -83,7 +82,6 @@ public enum TestsService {
 			nodeTechnique.setNoOfChildren(tunits.size());
 			nodeTechnique.setSubselector((tunits.size() > 0));
 			for (TestUnitDescription tu : tunits) {
-				// TODO: add metrics checking the size of the list
 				TreeNodeData nodeTest = new TreeNodeData();
 				nodeTest.setType(TestUnitDescription.class.getSimpleName());
 				nodeTest.setId(String.valueOf(tu.getTestUnitId()));
@@ -122,7 +120,7 @@ public enum TestsService {
 		testUnitDescription.setId(tu.getId());
 		TestProcedure p = testUnitDescription.getTestProcedure();
 		Set<Step> steps = p.getStep();
-		Set<Step> steps_ = new HashSet();
+		Set<Step> steps_ = new HashSet<Step>();
 		for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
 			Step step = iterator.next();
 			Step step1 = (Step) EAOManager.INSTANCE.getObjectEAO()
@@ -270,7 +268,7 @@ public enum TestsService {
 		return tu;
 	}
 
-	public boolean importTests(String indexFilePath, boolean newIds)
+	public boolean importTests(String indexFilePath)
 			throws ASBPersistenceException {
 		File indexF = new File(indexFilePath);
 		ExportTestFile indexFile = new ExportTestFile();
@@ -280,61 +278,70 @@ public enum TestsService {
 			logger.error("Cannot load index file for importing");
 			return false;
 		}
+		String testpath = null;
+		TestUnitDescription test = null;
 		for (String testPath : indexFile.getTests()) {
-			File metaFile = new File(testPath + "/meta.xml");
-			TestUnitDescription tu = (TestUnitDescription) JAXBUtils
-					.fileToObject(metaFile, TestUnitDescription.class);
-			if (newIds)
-				tu = this.prepareTestMeta(tu);
-			tu = TestsService.INSTANCE.insertTestUnit(tu);
-			String testpath = null;
-			// copy files
 			try {
-				String testId = tu.getTestUnitId();
-				String techId = tu.getTechnique().getWebTechnology()
-						.getNameId();
-				InOutUtils.createFolder(this.targetRootExportPath + "/"
-						+ techId);
-				testpath = techId + "/" + testId;
-				File targetExportFile = new File(this.targetRootExportPath
-						+ "/" + testpath);
-				File sourceExportTestFilesFile = new File(
-						sourceExportTestFilesPath + "/" + testpath);
-				InOutUtils.copyFolder(sourceExportTestFilesFile,
-						targetExportFile);
-				indexFile.getTests().add(testpath);
-			} catch (IOException e) {
-				logger.error("Error while copying test files: " + testpath);
-				logger.debug(e.getLocalizedMessage());
-				TestsService.INSTANCE.deleteTestUnit(tu.getId());
-				logger.error("deleting also the meta for: " + tu.getId());
-				continue;
-			}
-		}
+					File metaFile = new File(testPath + "/meta.xml");
+					TestUnitDescription tu = (TestUnitDescription) JAXBUtils
+							.fileToObject(metaFile, TestUnitDescription.class);
+					if(EAOManager.INSTANCE.getTestUnitDescriptionEAO().findByTestUnitId(tu.getTestUnitId())!=null){
+						logger.warn(tu.getTestUnitId() +" is already there.. skipping.. ");
+						continue;
+					}
+					test = new TestUnitDescription();
+					String techId = tu.getTechnique().getNameId();
+					Technique technique = EAOManager.INSTANCE.getTechniqueEAO().findByNameId(techId);
+					test.setTechnique(technique);
+					test.setTestUnitId(tu.getTestUnitId());
+					test.setComment(tu.getComment());
+					test.setCreator(tu.getCreator());
+					test.setDescription(tu.getDescription());
+					test.setLanguage(tu.getLanguage());
+					test.setRights(tu.getRights());
+					test.setStatus(tu.getStatus());
+					test.setSubject(tu.getSubject());
+					test.setTitle(tu.getTitle());
+					test.setVersion(tu.getVersion());
+					TestProcedure tp = tu.getTestProcedure();
+					TestProcedure tpn = new TestProcedure();
+					tpn.setYesNoQuestion(tp.getYesNoQuestion());
+					tpn.setExpectedResult(tp.isExpectedResult());
+					Set<Step> steps = tp.getStep();
+					for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
+						Step step = (Step) iterator.next();
+						step.setId(-1);
+						tpn.getStep().add(step);
+					}
+					test = TestsService.INSTANCE.insertTestUnit(test);
+					if(test!=null && test.getId()>0){
+						// copy files
+						//TODO: 
+						String path = TestUnitHelper
+								.getTestUnitFolderPath(test);
+						File targetExportFile = new File(path);
+						if (!targetExportFile.exists())
+							InOutUtils.makeDir(path);
+						testpath = techId + "/" + test.getTestUnitId();
+						File sourceExportTestFilesFile = new File(
+								sourceExportTestFilesPath + "/" + testpath);
+						InOutUtils.copyFolder(sourceExportTestFilesFile,
+								targetExportFile);
+						indexFile.getTests().add(testpath);
+					}
+				}
+				catch (IOException e) {
+						logger.error("Error while copying test files: " + testpath);
+						logger.debug(e.getLocalizedMessage());
+						this.deleteTestUnit(test);
+						logger.error("deleting also the meta for: " + test.getId());
+						continue;
+				}
+			}	
 		return true;
 	}
 
-	public TestUnitDescription prepareTestMeta(TestUnitDescription tu) {
-		// prepare meta for new database
-		tu.setId(-1);
-		String techniqueN = tu.getTechnique().getNameId();
-		Technique technique = EAOManager.INSTANCE.getTechniqueEAO()
-				.findByNameId(techniqueN);
-		if (technique != null)
-			tu.setTechnique(technique);
-		else {
-			tu.getTechnique().setId(-1);
-			WebTechnology webTechnology = EAOManager.INSTANCE
-					.getWebTechnologyEAO().findByNameId(
-							tu.getTechnique().getWebTechnology().getNameId());
-			if (webTechnology == null) {
-				tu.getTechnique().setWebTechnology(webTechnology);
-			} else {
-				tu.getTechnique().getWebTechnology().setId(-1);
-			}
-		}
-		return tu;
-	}
+
 
 	public void test2XMLFile(TestUnitDescription test) throws IOException,
 			JAXBException {

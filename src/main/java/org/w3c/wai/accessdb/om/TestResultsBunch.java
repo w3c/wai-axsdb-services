@@ -8,11 +8,14 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
-import org.hibernate.annotations.Cascade;
 import org.w3c.wai.accessdb.om.base.BaseEntity;
 import org.w3c.wai.accessdb.utils.DateAdapter;
 
@@ -22,10 +25,12 @@ import org.w3c.wai.accessdb.utils.DateAdapter;
  */
 @Entity
 @XmlRootElement 
+@XmlAccessorType(XmlAccessType.FIELD)
 public class TestResultsBunch extends BaseEntity {
-
 	private String optionalName = null;
 	@OneToMany(cascade={CascadeType.PERSIST, CascadeType.REFRESH})
+	@XmlElementWrapper(name="results")
+	@XmlElement(name = "result")
 	private List<TestResult> results  = new ArrayList<TestResult>();
 	@XmlJavaTypeAdapter(DateAdapter.class)
     @XmlSchemaType(name = "date")

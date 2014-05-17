@@ -13,13 +13,13 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.w3c.wai.accessdb.utils.DateAdapter;
 
-@XmlRootElement(name="tests")
+@XmlRootElement(name="testsSet")
 @XmlAccessorType(XmlAccessType.FIELD)
 
 public class ExportTestFile{
 	@XmlJavaTypeAdapter(DateAdapter.class)
 	private Date created;
-	@XmlElementWrapper(name="tests")
+	@XmlElementWrapper(name="test")
 	@XmlElement(name = "test")
 	private List<String> tests = new ArrayList<String>();
 	public Date getCreated() {

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.om.Technique;
 import org.w3c.wai.accessdb.services.TechniquesService;
+import org.w3c.wai.accessdb.services.TestResultsService;
 import org.w3c.wai.accessdb.services.TestingSessionService;
 import org.w3c.wai.accessdb.services.TestsService;
 import org.w3c.wai.accessdb.sync.TechniquesSpecParser;
@@ -39,24 +40,67 @@ public class AdminResource {
 		return Response.ok().build();
 	}*/
 
-	@Path("export/{sessionId}")
+	@Path("export/tests")
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response exportAllTests(@PathParam("sessionId") String sessionId) {
+	public Response exportAllTests() {
 		try {
-			if (!TestingSessionService.INSTANCE.isAuthenticatedAsAdmin(sessionId))
-			{
-			    logger.info("not appropriate permission for saving a test case. Need to have admin role");
-			    return Response.status(Response.Status.UNAUTHORIZED).build();
-			}
-		} catch (AuthenticationException e) {
-		    return Response.status(e.getErrorStatus()).build();
+			logger.info("Start export");
+			TestsService.INSTANCE.exportAllTests();
+			logger.info("done");
+			return Response.ok().build();
 		}
-        logger.info("OK you have permission.");
-		TestsService.INSTANCE.exportAllTests();
-		return Response.ok().build();
+		catch(Exception e){
+			logger.error(e.getLocalizedMessage());
+			return Response.noContent().entity(e).build();
+		}
 	}
-
+	@Path("export/testresults")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response exportAllTestResults() {
+		try {
+			logger.info("Start export");
+			TestResultsService.INSTANCE.exportAllTestResults();
+			logger.info("done");
+			return Response.ok().build();
+		}
+		catch(Exception e){
+			logger.error(e.getLocalizedMessage());
+			return Response.noContent().entity(e).build();
+		}
+	}
+	@Path("import/tests/{path}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response importAllTests(@PathParam("path") String path) {
+		try {
+			logger.info("Start import");
+			TestsService.INSTANCE.importTests(path);
+			logger.info("done");
+			return Response.ok().build();
+		}
+		catch(Exception e){
+			logger.error(e.getLocalizedMessage());
+			return Response.noContent().entity(e).build();
+		}
+	}
+	@Path("import/testresults/{path}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response importAllTestResults(@PathParam("path") String path) {
+		try {
+			logger.info("Start import");
+			TestResultsService.INSTANCE.importAllTestResults(path);
+			logger.info("done");
+			return Response.ok().build();
+		}
+		catch(Exception e){
+			logger.error(e.getLocalizedMessage());
+			return Response.noContent().entity(e).build();
+		}
+	}	
+	
 	@Path("techniques/{sessionId}")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })

@@ -6,8 +6,9 @@ import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.OneToOne;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 import org.w3c.wai.accessdb.om.base.BaseEntity;
@@ -21,6 +22,7 @@ import org.w3c.wai.accessdb.utils.TestUnitIdAdapter;
  */
 
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 public class TestResult extends BaseEntity
 {
@@ -40,7 +42,6 @@ public class TestResult extends BaseEntity
     private String comment;
     
     @XmlJavaTypeAdapter(DateAdapter.class)
-    @XmlSchemaType(name = "date")
     private Date runDate;
     
     public String getComment() {

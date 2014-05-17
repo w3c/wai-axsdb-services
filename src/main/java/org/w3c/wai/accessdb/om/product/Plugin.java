@@ -1,6 +1,8 @@
 package org.w3c.wai.accessdb.om.product;
 
 import javax.persistence.Entity;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 
@@ -10,6 +12,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @Entity 
 public class Plugin extends Product<Plugin>
 {

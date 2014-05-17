@@ -27,7 +27,14 @@ public class AxsDBApp {
 			}
 		} else if (cmd.equals("export-tests-results-all")) {
 			try {
-				TestResultsService.INSTANCE.exportAll();
+				TestResultsService.INSTANCE.exportAllTestResults();
+				System.out.println("Export done!");
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		} else if (cmd.equals("export-tests-all")) {
+			try {
+				TestsService.INSTANCE.exportAllTests();
 				System.out.println("Export done!");
 			} catch (Exception e) {
 				e.printStackTrace();

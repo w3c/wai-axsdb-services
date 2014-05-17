@@ -64,7 +64,29 @@ public enum TestResultsService {
 		}
 		return dataList;
 	}
+	/*
+	public List<TestResultViewData> loadTestResultByTestcaseViewData(
+			TestResultFilter filter, String techId) {
+		List<TestResultViewData> dataList = new ArrayList<TestResultViewData>();
+		List<Object[]> results = null;
+		try {
+			String q = TestResultFilterHelper.buildHQL4TestResultViewTechnique(
+					filter, techId);
+			logger.debug("loadTestResultView Query: " + q);
+			results = (List<Object[]>) EAOManager.INSTANCE.getTestResultEAO()
+					.doSimpleQuery(q);
+			logger.debug("loadTestResultView results: " + results.size());
 
+		} catch (Exception e) {
+			logger.error(e.getLocalizedMessage());
+		}
+		for (Object[] result : results) {
+			TestResultViewData data = new TestResultViewData(result, techId);
+			dataList.add(data);
+		}
+		return dataList;
+	}
+*/
 	public TestResultFullViewTechnique loadTestResultFullViewTechnique(
 			TestResultFilter filter, String techId) {
 		// find unique combinations based on filter and technique
@@ -246,8 +268,61 @@ public enum TestResultsService {
 		}
 		
 	}
-	
-	public void exportAll() {
+	public boolean importAllTestResults(String indexFilePath) throws ASBPersistenceException {
+		try{
+			File indexF = new File(indexFilePath);
+			ExportTestResultsFile indexFile = new ExportTestResultsFile();
+			indexFile = (ExportTestResultsFile) JAXBUtils.fileToObject(indexF,
+					ExportTestResultsFile.class);
+			if (indexFile == null) {
+				logger.error("Cannot load index file for importing");
+				return false;
+			}
+			for (TestResultsBunch bunch : indexFile.getTestResultsBunch()) {
+				String userId = bunch.getUser().getUserId();
+				TestResultsBunch b = new TestResultsBunch();
+				User user = EAOManager.INSTANCE.getUserEAO().findByUserId(userId);
+				if(user==null){
+					logger.warn("User not found: " + userId );
+					user = EAOManager.INSTANCE.getUserEAO().findByUserId("anon");
+					logger.warn("Anon user used");
+				}
+				b.setUser(user);
+				b.setDate(bunch.getDate());
+				b.setOptionalName(bunch.getOptionalName());
+				if(b.getOptionalName()==null){
+					b.setOptionalName("imported");
+				}
+				List<TestResult> rs = new ArrayList<TestResult>();
+				for(TestResult res : bunch.getResults()){
+					TestResult r = new TestResult();
+					TestUnitDescription tu = EAOManager.INSTANCE.getTestUnitDescriptionEAO().findByTestUnitId(res.getTestUnitDescription().getTestUnitId());
+					if(tu==null){
+						logger.warn("Test not found in db: " + tu.getTestUnitId());
+						continue;
+					}
+					r.setTestUnitDescription(tu);
+					r.setComment(res.getComment());
+					r.setResultValue(res.isResultValue());
+					r.setRunDate(res.getRunDate());
+					r.setTestingProfile(res.getTestingProfile());
+					logger.info("Addition result for test: " + r.getTestUnitDescription().getTestUnitId());
+					rs.add(r);
+				}
+				logger.info("Saving...");
+				this.saveResultsBunch(b);
+				logger.info("Saved successfully...");
+			}
+			return true;	
+		}
+		catch(Exception e){
+			logger.error("Unexpect import error: " + e.getLocalizedMessage());
+			logger.debug("Unexpect import error: ", e.getStackTrace());
+			return false;
+		}
+	}
+
+	public void exportAllTestResults() {
 		targetRootExportPath = ConfigService.INSTANCE
 				.getConfigParam("targetRootExportPath");
 		logger.info("Taking config param targetRootExportPath="
@@ -265,9 +340,15 @@ public enum TestResultsService {
 			logger.error("Cannot create export folder: " + targetExportPath);
 			logger.error(e.getLocalizedMessage());
 		}
-		InOutUtils.deleteFolderContents(folder);
-		List<TestResult> testResults = EAOManager.INSTANCE.getTestResultEAO().findAll();
-		indexFile.settestResults(testResults);
+		List<TestResultsBunch> bunches = EAOManager.INSTANCE.getTestResultsBunchEAO().findAll();
+		logger.info("no of bunchs " + bunches.size());
+		for (Iterator<TestResultsBunch> iterator = bunches.iterator(); iterator.hasNext();) {
+			TestResultsBunch testResultsBunch = (TestResultsBunch) iterator
+					.next();
+			List<TestResult> r = testResultsBunch.getResults();
+			logger.debug("Results for " + testResultsBunch.getId() + " " + r.size());
+			indexFile.getTestResultsBunch().add(testResultsBunch);
+		}
 		try {
 			JAXBUtils.objectToXmlFile(targetExportPath + "/testresults.xml",
 					indexFile);
@@ -275,10 +356,10 @@ public enum TestResultsService {
 					targetRootExportPath + "/" + exportId + ".zip"));
 		} catch (IOException e) {
 			logger.error("Error while writing export index file");
-			logger.debug(e.getLocalizedMessage());
+			logger.debug("IOException error stack: ", e);
 		} catch (JAXBException e) {
 			logger.error("Error while writing export index file");
-			logger.debug(e.getLocalizedMessage());
+			logger.debug("JAXBException error stack: ", e);
 		}
 	}
 

@@ -1,6 +1,8 @@
 package org.w3c.wai.accessdb.om.product;
 
 import javax.persistence.Entity;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -8,6 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @since 25.01.12
  */
 @XmlRootElement
+@XmlAccessorType(XmlAccessType.FIELD)
 @Entity
 public class AssistiveTechnology extends Product<AssistiveTechnology>
 {

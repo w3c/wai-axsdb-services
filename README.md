@@ -42,9 +42,45 @@ Project page: http://www.w3.org/WAI/ACT/
 ## REST API
 
 AccessDB offers a number of open Interfaces through REST interfaces. In summary the current interfaces with accompanies appropriate methods are: 
+### Data Types
 
-+ TestingSession: Provides functionality for managing a user AccessDB session like login, logout etc. 
-+ Testunit: Provides functionality for managing the test cases like saving new, editing etc.
+```javascript
+  session : {
+      sessionName: null,
+      sessionId: null, 
+      testProfileId: "-1",
+      testUnitIdList: [],
+      testResultList: [],
+      ratings: [],
+      currentTestUnitId: "-1",
+      userTestingProfiles: [],
+      userId: null,
+      userRoles: [],
+      lastTestUnit: null,       
+      pCounter: -10
+  }
+``` 
+
+### TestingSession
+
+Provides functionality for managing a user AccessDB session like login, logout etc. 
+
++ *URL*: testingsession/commit 
++ *Method*: POST
++ *Request Data Type*: session
++ *Response*: HTTP.Status
+
+```javascript
+save: function (session, callback) {
+                accessdb.sessionId = session.get("sessionId");
+                Utils.ajaxAsyncWithCallBack(accessdb.config.services.URL_SERVICE_TESTINGSESSION_SAVE, 'POST', session, callback);
+            },
+'''
+
+### Testunit: 
+
+Provides functionality for managing the test cases like saving new, editing etc.
+
 + Requirement: Provides functionality for getting information about testing requirements including WCAG Principles Guidelines, Success Criteria, HTML techniques, CSS techniques etc.
 + Profile: Provides functionality for managing the Testing Profiles
 + Testresult: Provides functionality for managing the Test Results

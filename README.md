@@ -41,7 +41,9 @@ Project page: http://www.w3.org/WAI/ACT/
 
 ## REST API
 
-AccessDB offers a number of open Interfaces through REST interfaces. In summary the current interfaces with accompanies appropriate methods are: 
+See Javascript implemention of the REST API:
+https://github.com/w3c/wai-axsdb-web/blob/master/js/API.js
+
 ### Data Types
 
 ```javascript
@@ -63,19 +65,17 @@ AccessDB offers a number of open Interfaces through REST interfaces. In summary 
 
 ### TestingSession
 
-Provides functionality for managing a user AccessDB session like login, logout etc. 
+Provides functionality for managing a user session like login, logout etc. The session is saved client side by combining sessionStorage and cookies but also server side. 
 
+#### TestingSession#save
+
++ *Description*: Saves user session both locally and remotely 
 + *URL*: testingsession/commit 
 + *Method*: POST
 + *Request Data Type*: session
 + *Response*: HTTP.Status
 
-```javascript
-save: function (session, callback) {
-                accessdb.sessionId = session.get("sessionId");
-                Utils.ajaxAsyncWithCallBack(accessdb.config.services.URL_SERVICE_TESTINGSESSION_SAVE, 'POST', session, callback);
-            },
-'''
+
 
 ### Testunit: 
 

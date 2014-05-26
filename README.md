@@ -44,6 +44,10 @@ Project page: http://www.w3.org/WAI/ACT/
 See Javascript implemention of the REST API:
 https://github.com/w3c/wai-axsdb-web/blob/master/js/API.js
 
+In addition there is also a developer workbench for allowing developers to experiment with the data and the API functionality. 
+
+AxsdbQL --> HQL like .. explain
+
 ### Data Types
 
 ```javascript
@@ -81,13 +85,26 @@ Provides functionality for managing a user session like login, logout etc. The s
 
 Provides functionality for managing the test cases like saving new, editing etc.
 
-+ Requirement: Provides functionality for getting information about testing requirements including WCAG Principles Guidelines, Success Criteria, HTML techniques, CSS techniques etc.
-+ Profile: Provides functionality for managing the Testing Profiles
-+ Testresult: Provides functionality for managing the Test Results
-+ Query: Provides a way of read only querying the database from the client using HQL
-+ Rating: Provides functionality for managing any rating (test case or test result)
+### Requirement
 
-In addition there is also a developer workbench for allowing developers to experiment with the data and the API functionality. 
+Provides functionality for getting information about testing requirements including WCAG Principles Guidelines, Success Criteria, HTML techniques, CSS techniques etc.
+
+### Profile
+
+Provides functionality for managing the Testing Profiles
+
+### Testresult 
+
+Provides functionality for managing the Test Results
+
+### Query
+
+Provides a way of read only querying the database from the client using HQL
+
+### Rating
+
+Provides functionality for managing any rating (test case or test result)
+
 
 ## TODO
 

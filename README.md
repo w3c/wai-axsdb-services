@@ -65,6 +65,19 @@ AxsdbQL --> HQL like .. explain
       lastTestUnit: null,       
       pCounter: -10
   }
+  
+  filter : {
+        page : "",
+        userName : null,
+        lastModified: "",
+        criteriosLevel : "AAA",
+        criterios : [],
+        technologies : [],
+        ats : [],
+        uas : [],
+        oss : []
+    };
+    
 ``` 
 
 ### TestingSession

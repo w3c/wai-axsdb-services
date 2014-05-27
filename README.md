@@ -25,6 +25,7 @@ Add a session to the server side session pool. If there is no session id an id i
 + *Method*: POST
 + *Request Data Type*: TestingSession
 + *Response HTTP Status*: OK=200 / NOT_MODIFIED: 304
++ *Response Entity*: TestingSession
 
 #### TestingSession#getSession
 
@@ -38,7 +39,7 @@ Gets a session object by session id.
 
 #### TestingSession#login
 
-Authenication / Authorization of the session
+Authentication / Authorization of the session
 
 + *URL*: testingsession/login
 + *Method*: POST
@@ -64,6 +65,102 @@ Given a session, this persists the content (test results, [TODO: search filters]
 + *Method*: POST
 + *Request Data Type*: Null
 + *Response HTTP Status*: OK=200 / NOT_MODIFIED: 304
++ *Response Entity*: TestingSession
+
+### Profile
+
+Provides functionality for managing Testing Profiles
+
+#### Profile#insertTestingProfile
+
+Inserts in database a testing profile for the specific user
+
++ *URL*: profile/{userId}/{sessionId}
++ *Method*: POST
++ *Request Data Type*: UserTestingProfile 
++ *Response HTTP Status*:  CREATED=201 / NOT_MODIFIED=304 / UNAUTHORIZED: 401
++ *Response Entity*: profileId
+
+#### Profile#updateTestingProfile
+
+Updates in database a testing profile for the specific user
+
++ *URL*: profile/put/{sessionId}
++ *Method*: POST
++ *Request Data Type*: UserTestingProfile 
++ *Response HTTP Status*:  CREATED=201 / NOT_MODIFIED=304 / UNAUTHORIZED: 401
++ *Response Entity*: profileId
+
+#### Profile#deleteTestingProfile
+
+Deletes in database a testing profile for the specific user
+
++ *URL*: profile/{pid}/{sessionId}
++ *Method*: DELETE
++ *Request Data Type*: Null 
++ *Response HTTP Status*:   CREATED=200 / NOT_FOUND=404/ NOT_MODIFIED=304 / UNAUTHORIZED= 401
++ *Response Entity*: profileId
+ 
+
+#### Profile#getProfilesByUserId
+
+Get Profiles By UserId
+
++ *URL*: profile/{userId}/{sessionId}
++ *Method*: POST
++ *Request Data Type*: 
++ *Response HTTP Status*:  OK=200 / UNAUTHORIZED: 401+ 
++ *Response Entity* :List of UserTestingProfile 
+
+#### Profile#getAssistiveTechnologies
+
+Retrieve unique AssistiveTechnologies in existing testing profiles
+
++ *URL*: browse/ATs/{term}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of AssistiveTechnology 
+
+#### Profile#getPlatforms
+
+Retrieve unique Platforms (OSs) in existing testing profiles
+
++ *URL*: browse/platforms/{term}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of Platform 
+
+#### Profile#getUserAgents
+
+Retrieve unique User Agents (browsers) in existing testing profiles
+
++ *URL*: browse/UAs/{term}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of UserAgent 
+
+#### Profile#getPlugins
+
+Retrieve unique Plugins in existing testing profiles
+
++ *URL*: browse/Plugins/{term}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of Plugin 
+
+#### Profile#getProfileById
+
+Retrieve testing profile by id
+
++ *URL*:"browse/{profileId}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : TestingProfile or Null
 
 
 
@@ -75,9 +172,6 @@ Provides functionality for managing the test cases like saving new, editing etc.
 
 Provides functionality for getting information about testing requirements including WCAG Principles Guidelines, Success Criteria, HTML techniques, CSS techniques etc.
 
-### Profile
-
-Provides functionality for managing the Testing Profiles
 
 ### Testresult 
 

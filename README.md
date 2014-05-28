@@ -208,9 +208,69 @@ Get TreeNodeData with Tests based on Filter
 + *Response HTTP Status*:  OK=200
 + *Response Entity* :  treeNodeData
 
+#### Test#getTestAsXml
+
+Get Test as XML by testUnitId
+
++ *URL*:test/xml/{id}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* :  XML as text
+
+#### Test#updateTestFromXml
+
+Update Test from XML 
+
++ *URL*:test/xml/{sessionId}
++ *Method*: POST
++ *Request Data Type*: Test 
++ *Response HTTP Status*:  OK=200 |  NOT_MODIFIED=304 | NOT_ACCEPTABLE=406 | UNAUTHORIZED=401
++ *Response Entity* :  Test
+
+#### Test#deleteTest
+
+Deletes Test by id
+
++ *URL*:test/{sessionId}/{id}
++ *Method*: DELETE
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200 |  NOT_MODIFIED=304 | NOT_ACCEPTABLE=406 | UNAUTHORIZED=401
++ *Response Entity* :  
+ 
+#### Test#updateTest
+
+Updates a test
+
++ *URL*:test/status/{sessionId}
++ *Method*: POST
++ *Request Data Type*: Test
++ *Response HTTP Status*:  OK=200 |  NOT_MODIFIED=304 | UNAUTHORIZED=401
++ *Response Entity* : Test
+
+#### Test#deleteResourceFile
+
+Deletes a resource file of a Test
+
++ *URL*:test/resource/{sessionId}/{testUnitId}/{fileId}
++ *Method*: DELETE
++ *Request Data Type*: 
++ *Response HTTP Status*:  OK=200 |  NOT_MODIFIED=304 | UNAUTHORIZED=401
++ *Response Entity* : 
+
+#### Test#testPersist
+
+Saves a test posted by a form. See config file (FORM_TESTUNIT_FORMFIELD_TESTUNITDESCRIPTION, FORM_TESTUNIT_FORMFIELD_CODE,FORM_TESTUNIT_FORMFIELD_TESTFILE). See more in [config section](#Config) 
+
++ *URL*:test/commit/{sessionId}
++ *Method*: POST
++ *Request Data Type*: HttpServletRequest (Form Post [TODO: explain])
++ *Response HTTP Status*:   CREATED=201 |  NOT_MODIFIED=304 | UNAUTHORIZED=401
++ *Response Entity* : testUnitId
 
 
-### Requirement
+
+### WCAG2
 
 Provides functionality for getting information about testing requirements including WCAG Principles Guidelines, Success Criteria, HTML techniques, CSS techniques etc.
 
@@ -323,6 +383,10 @@ Provides functionality for managing any rating (test case or test result)
 + Mysql
 + RestEasy
 
+
+## Config
+
+TODO
 
 ## Build
 

@@ -72,20 +72,15 @@ public class JAXBUtils {
 
 	}
 
-	public static Object stringToObject(String s, Class theclass) {
+	public static Object stringToObject(String s, Class theclass) throws JAXBException {
 		Object o = null;
-		try {
-			ByteArrayInputStream input = new ByteArrayInputStream(s.getBytes());
-			JAXBContext jaxbContext = JAXBContext.newInstance(theclass);
-			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			o = theclass.cast(jaxbUnmarshaller.unmarshal(input));
-
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		ByteArrayInputStream input = new ByteArrayInputStream(s.getBytes());
+		JAXBContext jaxbContext = JAXBContext.newInstance(theclass);
+		Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+		o = theclass.cast(jaxbUnmarshaller.unmarshal(input));
 		return o;
 	}
+
 	public static Object fileToObject(File file, Class theclass) {
 		Object o = null;
 		try {
@@ -99,7 +94,7 @@ public class JAXBUtils {
 		}
 		return o;
 	}
-	
+
 	public static File objectToXmlFile(String path, Object o)
 			throws IOException, JAXBException {
 		File file = InOutUtils.createFile(path);

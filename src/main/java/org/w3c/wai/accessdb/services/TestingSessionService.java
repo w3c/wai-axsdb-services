@@ -46,11 +46,8 @@ public enum TestingSessionService {
 			s =  this.sessions.get(sessionid);
 		}
 		catch (Exception e) {
-            this.clean();
-			s = new TestingSession();
+           
 		}
-		if(s==null)
-			s = new TestingSession();
 		return s;
 	}
 

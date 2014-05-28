@@ -56,7 +56,8 @@ Session log out
 + *Request Data Type*: Null
 + *Response HTTP Status*: OK=200
 + *Response Entity*: Null
- 
+
+
 #### TestingSession#persist
 
 Given a session, this persists the content (test results, [TODO: search filters]) in the database. 
@@ -71,7 +72,7 @@ Given a session, this persists the content (test results, [TODO: search filters]
 
 Provides functionality for managing Testing Profiles
 
-#### Profile#insertTestingProfile
+#### Profile#insertUserProfile
 
 Inserts in database a testing profile for the specific user
 
@@ -81,7 +82,7 @@ Inserts in database a testing profile for the specific user
 + *Response HTTP Status*:  CREATED=201 / NOT_MODIFIED=304 / UNAUTHORIZED: 401
 + *Response Entity*: profileId
 
-#### Profile#updateTestingProfile
+#### Profile#updateUserProfile
 
 Updates in database a testing profile for the specific user
 
@@ -91,7 +92,7 @@ Updates in database a testing profile for the specific user
 + *Response HTTP Status*:  CREATED=201 / NOT_MODIFIED=304 / UNAUTHORIZED: 401
 + *Response Entity*: profileId
 
-#### Profile#deleteTestingProfile
+#### Profile#deleteUserProfile
 
 Deletes in database a testing profile for the specific user
 
@@ -102,7 +103,7 @@ Deletes in database a testing profile for the specific user
 + *Response Entity*: profileId
  
 
-#### Profile#getProfilesByUserId
+#### Profile#findByUserId
 
 Get Profiles By UserId
 
@@ -114,9 +115,9 @@ Get Profiles By UserId
 
 #### Profile#getAssistiveTechnologies
 
-Retrieve unique AssistiveTechnologies in existing testing profiles
+Retrieve unique AssistiveTechnologies in existing testing profiles by term
 
-+ *URL*: browse/ATs/{term}
++ *URL*: profile/browse/ATs/{term}
 + *Method*: GET
 + *Request Data Type*:  
 + *Response HTTP Status*:  OK=200
@@ -124,9 +125,9 @@ Retrieve unique AssistiveTechnologies in existing testing profiles
 
 #### Profile#getPlatforms
 
-Retrieve unique Platforms (OSs) in existing testing profiles
+Retrieve unique Platforms (OSs) in existing testing profiles by term
 
-+ *URL*: browse/platforms/{term}
++ *URL*: profile/browse/platforms/{term}
 + *Method*: GET
 + *Request Data Type*:  
 + *Response HTTP Status*:  OK=200
@@ -134,9 +135,9 @@ Retrieve unique Platforms (OSs) in existing testing profiles
 
 #### Profile#getUserAgents
 
-Retrieve unique User Agents (browsers) in existing testing profiles
+Retrieve unique User Agents (browsers) in existing testing profiles by term
 
-+ *URL*: browse/UAs/{term}
++ *URL*: profile/browse/UAs/{term}
 + *Method*: GET
 + *Request Data Type*:  
 + *Response HTTP Status*:  OK=200
@@ -144,29 +145,40 @@ Retrieve unique User Agents (browsers) in existing testing profiles
 
 #### Profile#getPlugins
 
-Retrieve unique Plugins in existing testing profiles
+Retrieve unique Plugins in existing testing profiles by term
 
-+ *URL*: browse/Plugins/{term}
++ *URL*: profile/browse/Plugins/{term}
 + *Method*: GET
 + *Request Data Type*:  
 + *Response HTTP Status*:  OK=200
 + *Response Entity* : List of Plugin 
 
-#### Profile#getProfileById
+#### Profile#findByProfileId
 
 Retrieve testing profile by id
 
-+ *URL*:"browse/{profileId}
++ *URL*:"profile/browse/{profileId}
 + *Method*: GET
 + *Request Data Type*:  
 + *Response HTTP Status*:  OK=200
 + *Response Entity* : TestingProfile or Null
 
 
-
 ### Test
 
-Provides functionality for managing the test cases like saving new, editing etc.
+Provides functionality for managing the tests like saving new, editing etc.
+
+#### Test#
+
+ tests
+
++ *URL*:"test/
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : 
+
+
 
 ### Requirement
 
@@ -214,6 +226,20 @@ Provides functionality for managing any rating (test case or test result)
         uas : [],
         oss : []
     };
+    
+   TreeData : {
+        "label":"ROOT",
+        "children":[TreeData],
+        "value":null,
+        "selected":false,
+        "disabled":false,
+        "subselector":true,
+        "selectable":true,
+        "collapsed":true,
+        "type":"ROOT",
+        "description":null,
+        "noOfChildren":0
+   }
     
 
 ``` 

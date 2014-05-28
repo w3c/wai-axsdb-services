@@ -24,11 +24,16 @@ import org.w3c.wai.accessdb.jaxb.ElementWrapper;
 @Path("query")
 public class QueryResource {
 	final static Logger logger = LoggerFactory.getLogger(QueryResource.class);
-
+	
+	/**
+	 * This is the general Query method. Here AxsDB select only HQL queries can be executed
+	 * @param q
+	 * @return
+	 */
 	@Path("{q}") 
 	@GET	
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getResultByQuery(@PathParam("q") String q) {
+	public Response findByQuery(@PathParam("q") String q) {
 		List res = new ArrayList();
 		try {
 			q = URLDecoder.decode(q,"UTF-8"); 
@@ -47,36 +52,6 @@ public class QueryResource {
 		}
 		logger.debug("Siye of result list: "+res.size());
 		return Response.ok(new ElementWrapper(res)).build();
-	}
-	@Path("browse/byquery/{q}/first/{first}/limit/{limit}")
-	@GET	
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getResultByQueryAndPaging(@PathParam("q") String q,@PathParam("first") String first,@PathParam("limit") String limit) {
-		List res = new ArrayList();
-		try {
-			q = URLDecoder.decode(q,"UTF-8"); 
-		} catch (UnsupportedEncodingException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
-		try{ 
-			res = EAOManager.INSTANCE.getObjectEAO().doSimpleSelectOnlyQuery(q, Integer.parseInt(first), Integer.parseInt(limit));	
-		}
-		catch(Exception e)
-		{
-			e.printStackTrace();
-			return Response.serverError().build();
-		}
-		return Response.ok(new ElementWrapper(res)).build();
-	}
-	
-	
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })	
-	@Path("/echo/{msg}")
-	public String echoService(@PathParam("msg") String msg)
-	{
-		return msg;
 	}
 	
 	

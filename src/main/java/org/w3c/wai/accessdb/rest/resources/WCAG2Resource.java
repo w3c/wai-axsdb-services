@@ -1,8 +1,5 @@
 package org.w3c.wai.accessdb.rest.resources;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -25,147 +22,142 @@ import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 /**
  * @author evangelos.vlachogiannis
  * @since 16.04.12
- */ 
+ */
 @Path("wcag2")
-public class WCAG2Resource
-{
-    @Path("browse/wcag2/tree/{level}")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getWCAGTreeData(@PathParam("level") String level)
-    {
-        return Response.ok(
-        		WCAG2Service.INSTANCE.getSimpleWCAGTreeData(level))
-                .build();
-    }
-    @Path("browse/webtechs/tree")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getWCAGTechs()
-    {
-        return Response.ok(
-                TechniquesService.INSTANCE.getWebTechnologiesTree()).build();
-    }
-    @Path("browse/webtechswithtechniques/tree")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getWebTechnologiesWithTechniquesTree()
-    {
-        return Response.ok(
-                TechniquesService.INSTANCE.getWebTechnologiesWithTechniquesTree()).build();
-    }
-    @Path("browse/byquery/{q}")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Response getRequirementByQuery(@PathParam("q") String q)
-    {
-        List res = new ArrayList();
-        try
-        {
-            q = URLDecoder.decode(q, "UTF-8");
-        }
-        catch (UnsupportedEncodingException e1)
-        {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
-        }
-        try
-        {
-            res = EAOManager.INSTANCE.getObjectEAO().doSimpleSelectOnlyQuery(q);
-        }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-            return Response.serverError().build();
-        }
-        return Response.ok(new ElementWrapper(res)).build();
-    }
+public class WCAG2Resource {
+	/**
+	 * The WCAG2 Principles/geuidelines/SuccessCriteria TreeNodeData
+	 * 
+	 * @param level
+	 * @return
+	 */
+	@Path("browse/wcag2/tree/{level}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getWCAG2TreeData(@PathParam("level") String level) {
+		return Response.ok(WCAG2Service.INSTANCE.getSimpleWCAGTreeData(level))
+				.build();
+	}
 
-    @Path("techniques/{type}")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public ElementWrapper<Technique> getTechniques(
-            @PathParam("type") String techTypeS) throws ASBPersistenceException
-    {
-        return new ElementWrapper<Technique>(
-                TechniquesService.INSTANCE.retrieveTechniques(techTypeS));
-    }
+	/**
+	 * The Web Technologies (Technologies Techniques) TreeNodeData
+	 * 
+	 * @return
+	 */
+	@Path("browse/webtechs/tree")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getWCAGTechs() {
+		return Response.ok(TechniquesService.INSTANCE.getWebTechnologiesTree())
+				.build();
+	}
 
-    @Path("techniques")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public ElementWrapper<Technique> getTechniques()
-    {
-        return new ElementWrapper<Technique>(EAOManager.INSTANCE
-                .getTechniqueEAO().findAll());
-    }
+	/**
+	 * The Web Technologies (Technologies Techniques) TreeNodeData
+	 * 
+	 * @return
+	 */
+	@Path("browse/webtechswithtechniques/tree")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getWebTechnologiesWithTechniquesTreeData() {
+		return Response.ok(
+				TechniquesService.INSTANCE
+						.getWebTechnologiesWithTechniquesTree()).build();
+	}
 
-    @Path("/technique/{type}/byid/{id}")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public Technique getTechniqueById(@PathParam("type") String techTypeS,
-            @PathParam("id") String id)
-    {
-    	try{
-            return EAOManager.INSTANCE.getTechniqueEAO().findById(Long.parseLong(id));    		
-    	}
-    	catch(Exception e){
-    		return null;
-    	}
-    }
+	/**
+	 * Get the Techniques by web technology name id (e.g WCAG20-ARIA-TECHS)
+	 * 
+	 * @param nameId
+	 * @return
+	 * @throws ASBPersistenceException
+	 */
+	@Path("techniques/{nameId}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public ElementWrapper<Technique> findTechniquesByWebTechNameId(
+			@PathParam("nameId") String nameId) throws ASBPersistenceException {
+		return new ElementWrapper<Technique>(
+				TechniquesService.INSTANCE.retrieveTechniques(nameId));
+	}
 
-    @GET
-    @Path("/techniques/byterm/{term}")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public List<Technique> getTechniqueByTerm(@PathParam("term") String term)
-    {
-        return TechniquesService.INSTANCE.getTechniquesByTerm(term);
-    }
-    
-    
+	/**
+	 * Get all techniques
+	 * 
+	 * @return
+	 */
+	@Path("techniques")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public ElementWrapper<Technique> getAllTechniques() {
+		return new ElementWrapper<Technique>(EAOManager.INSTANCE
+				.getTechniqueEAO().findAll());
+	}
 
-    @Path("principles")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public ElementWrapper<Principle> getPrinciples()
-    {
-        return new ElementWrapper<Principle>(EAOManager.INSTANCE
-                .getPrincipleEAO().findAll());
-    }
+	/**
+	 * Get Technique by DB id
+	 */
+	@Path("technique/byid/{id}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Technique getTechniqueById(@PathParam("id") String id) {
+		try {
+			return EAOManager.INSTANCE.getTechniqueEAO().findById(
+					Long.parseLong(id));
+		} catch (Exception e) {
+			return null;
+		}
+	}
 
-    @Path("guidelines")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public ElementWrapper<Guideline> getGuidelines()
-    {
-        return new ElementWrapper<Guideline>(EAOManager.INSTANCE
-                .getGuidelineEAO().findAll());
-    }
+	/**
+	 * 
+	 * @param term
+	 * @return
+	 */
+	@GET
+	@Path("techniques/byterm/{term}")
+	@Produces({ MediaType.APPLICATION_JSON })
+	public List<Technique> getTechniqueByTerm(@PathParam("term") String term) {
+		return TechniquesService.INSTANCE.getTechniquesByTerm(term);
+	}
 
-    @Path("sc")
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    public ElementWrapper<SuccessCriterio> getSC()
-    {
-        return new ElementWrapper<SuccessCriterio>(EAOManager.INSTANCE
-                .getCriterioEAO().findAll());
-    }
+	/**
+	 * Get all Principles
+	 * 
+	 * @return
+	 */
+	@Path("principles")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public ElementWrapper<Principle> getAllPrinciples() {
+		return new ElementWrapper<Principle>(EAOManager.INSTANCE
+				.getPrincipleEAO().findAll());
+	}
 
-    @GET
-    @Path("/criteria")
-    @Produces({ MediaType.APPLICATION_JSON })
-    public List<SuccessCriterio> getCriteria()
-    {
-        return EAOManager.INSTANCE.getCriterioEAO().findAll();
+	/**
+	 * Get all Guidelines
+	 * 
+	 * @return
+	 */
+	@Path("guidelines")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public ElementWrapper<Guideline> getAllGuidelines() {
+		return new ElementWrapper<Guideline>(EAOManager.INSTANCE
+				.getGuidelineEAO().findAll());
+	}
 
-    }
-
-    @GET
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Path("/echo/{msg}")
-    public String echoService(@PathParam("msg") String msg)
-    {
-        return msg;
-    }
-
+	/**
+	 * Get all Success Criteria
+	 * 
+	 * @return
+	 */
+	@Path("criteria")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public ElementWrapper<SuccessCriterio> getAllSuccessCriteria() {
+		return new ElementWrapper<SuccessCriterio>(EAOManager.INSTANCE
+				.getCriterioEAO().findAll());
+	}
 }

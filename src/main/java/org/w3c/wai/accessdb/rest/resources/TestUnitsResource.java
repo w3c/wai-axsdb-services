@@ -2,7 +2,6 @@ package org.w3c.wai.accessdb.rest.resources;
 
 import java.io.File;
 import java.net.URI;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -17,6 +16,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
+import javax.xml.bind.JAXBException;
 
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileItemFactory;
@@ -45,16 +46,61 @@ import org.w3c.wai.accessdb.utils.JAXBUtils;
  * @author evangelos.vlachogiannis
  * @since 16.04.12
  */
-@Path("testunit")
+@Path("test")
 public class TestUnitsResource {
 	final static Logger logger = LoggerFactory
 			.getLogger(TestUnitsResource.class);
+	/**
+	 * 
+	 * @return
+	 */
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public ElementWrapper<TestUnitDescription> findAll() {
+		return new ElementWrapper<TestUnitDescription>(
+				TestsService.INSTANCE.findAllTestDescriptions());
+	}
+	
+	/**
+	 * Finds an existing Test by testUnitId
+	 * @param testUnitId
+	 * @return
+	 */
+	@Path("{testUnitId}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response findByUnitId(@PathParam("testUnitId") String testUnitId) {
+		TestUnitDescription t = EAOManager.INSTANCE.getTestUnitDescriptionEAO()
+				.findByTestUnitId(testUnitId);
+		if (t == null)
+			return Response.status(Status.NOT_FOUND).build();
+		else
+			return Response.status(Status.OK).entity(t).build();
+	}
+	/**
+	 * Finds Tests by Technique Id
+	 * @param tid
+	 * @return
+	 */
+	@Path("byTechnique/{tid}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public ElementWrapper<TestUnitDescription> findByTechnique(
+			@PathParam("tid") String tid) {
+		return new ElementWrapper<TestUnitDescription>(EAOManager.INSTANCE
+				.getTestUnitDescriptionEAO().findByTechnique(tid));
+	}
 
-	@Path("browse/tests/tree")
+	/**
+	 * Get TreeNodeData with Tests based on Filter
+	 * @param filter
+	 * @return
+	 */
+	@Path("tree")
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response getTests(TestResultFilter filter) {
+	public Response getTestsTreeData(TestResultFilter filter) {
 		try {
 			return Response.ok(
 					TestsService.INSTANCE.getTestsPerTechniqueNode(filter))
@@ -64,77 +110,55 @@ public class TestUnitsResource {
 		}
 	}
 
-	@Path("browse")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public ElementWrapper<TestUnitDescription> getTestUnitEntities() {
-		return new ElementWrapper<TestUnitDescription>(
-				TestsService.INSTANCE.findAllTestDescriptions());
-	}
-
-	// TODO: in requirementsresizrce?
-	@Path("browse/byTechnique/{tid}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public ElementWrapper<TestUnitDescription> getTestUnitEntitiesByTechnique(
-			@PathParam("tid") String tid) {
-		return new ElementWrapper<TestUnitDescription>(EAOManager.INSTANCE
-				.getTestUnitDescriptionEAO().findByTechnique(tid));
-	}
-
-	// TODO: remove
-	@Path("browse/byquery/{q}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getRequirementsByQuery(@PathParam("q") String q) {
-		List<TestUnitDescription> res = new ArrayList<TestUnitDescription>();
-		try {
-			res = EAOManager.INSTANCE.getObjectEAO().doSimpleSelectOnlyQuery(q);
-		} catch (Exception e) {
-			return Response.serverError().build();
-		}
-		return Response.ok(new ElementWrapper<TestUnitDescription>(res))
-				.build();
-	}
-
-	@Path("browse/{id}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public TestUnitDescription getTestUnit(@PathParam("id") String id) {
-		return EAOManager.INSTANCE.getTestUnitDescriptionEAO()
-				.findByTestUnitId(id);
-	}
-
-	@Path("browse/astext/{id}")
+	/**
+	 * Get Test as XML by testUnitId
+	 * @param id
+	 * @return
+	 */
+	@Path("xml/{id}")
 	@GET
 	@Produces({ MediaType.TEXT_PLAIN })
-	public String getTestUnitAsText(@PathParam("id") String id) {
+	public String getTestAsXml(@PathParam("id") String id) {
 		TestUnitDescription t = EAOManager.INSTANCE.getTestUnitDescriptionEAO()
 				.findByTestUnitId(id);
 		return JAXBUtils.XmlObjectToString(t);
 	}
 
-	@Path("moderate/astext/{sessionId}")
+	/**
+	 * Update Test from XML 
+	 * @param s
+	 * @param sessionId
+	 * @param tu
+	 * @return
+	 */
+	@Path("xml/{sessionId}")
 	@POST
-	public Response updateTestUnitAsText(String s,
-			@PathParam("sessionId") String sessionId)
+	public Response updateTestFromXml(String s,
+			@PathParam("sessionId") String sessionId, TestUnitDescription tu)
 
 	{
 		if (!TestingSessionService.INSTANCE.isAuthenticated(sessionId))
 			return Response.status(Response.Status.UNAUTHORIZED).build();
-		TestUnitDescription tu = (TestUnitDescription) JAXBUtils
-				.stringToObject(s, TestUnitDescription.class);
 		try {
-			EAOManager.INSTANCE.getTestUnitDescriptionEAO().persist(tu);
+			tu = (TestUnitDescription) JAXBUtils
+					.stringToObject(s, TestUnitDescription.class);
+			tu = EAOManager.INSTANCE.getTestUnitDescriptionEAO().persist(tu);
+		} catch (JAXBException e1) {
+			return Response.status(Response.Status.NOT_ACCEPTABLE).build();
 		} catch (ASBPersistenceException e) {
 			Response.notModified(e.getLocalizedMessage()).build();
 		}
-		return Response.ok().build();
+		return Response.ok(tu).build();
 	}
-
-	@Path("moderate/{sessionId}/{id}")
+	/**
+	 * Delete Test by testUnitId
+	 * @param sessionId
+	 * @param id
+	 * @return
+	 */
+	@Path("{sessionId}/{id}")
 	@DELETE
-	public Response deleteTestUnit(@PathParam("sessionId") String sessionId,
+	public Response deleteTest(@PathParam("sessionId") String sessionId,
 			@PathParam("id") String id) {
 		if (!TestingSessionService.INSTANCE.isAuthenticated(sessionId))
 			return Response.status(Response.Status.UNAUTHORIZED).build();
@@ -143,11 +167,16 @@ public class TestUnitsResource {
 		else
 			return Response.status(Response.Status.NOT_MODIFIED).build();
 	}
-
-	@Path("moderate/{sessionId}")
+	/**
+	 * Updates a test
+	 * @param tu
+	 * @param sessionId
+	 * @return
+	 */
+	@Path("update/{sessionId}")
 	@POST
 	@Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
-	public Response updateTestUnitStatus(TestUnitDescription tu,
+	public Response updateTest(TestUnitDescription tu,
 			@PathParam("sessionId") String sessionId) {
 		try {
 			if (!TestingSessionService.INSTANCE
@@ -159,12 +188,12 @@ public class TestUnitsResource {
 			return Response.status(e1.getErrorStatus()).build();
 		}
 		try {
-			EAOManager.INSTANCE.getTestUnitDescriptionEAO().persist(tu);
+			tu = EAOManager.INSTANCE.getTestUnitDescriptionEAO().persist(tu);
 		} catch (ASBPersistenceException e) {
 			logger.warn(e.getLocalizedMessage());
 			return Response.notModified(e.getLocalizedMessage()).build();
 		}
-		return Response.ok().build();
+		return Response.ok(tu).build();
 
 	}
 
@@ -213,10 +242,16 @@ public class TestUnitsResource {
 		}
 		return Response.ok().build();
 	}
-
+/**
+ * Saves a test posted by a form. 
+ * See config file (FORM_TESTUNIT_FORMFIELD_TESTUNITDESCRIPTION, FORM_TESTUNIT_FORMFIELD_CODE,FORM_TESTUNIT_FORMFIELD_TESTFILE)
+ * @param req
+ * @param sessionId
+ * @return
+ */
 	@POST
 	@Path("commit/{sessionId}")
-	public Response unitStore(@Context HttpServletRequest req,
+	public Response testPersist(@Context HttpServletRequest req,
 			@PathParam("sessionId") String sessionId) {
 		try {
 			if (!TestingSessionService.INSTANCE

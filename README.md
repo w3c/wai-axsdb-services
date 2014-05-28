@@ -269,19 +269,135 @@ Saves a test posted by a form. See config file (FORM_TESTUNIT_FORMFIELD_TESTUNIT
 + *Response Entity* : testUnitId
 
 
+### Query
+
+Provides a way of read only querying the database. Here AxsDB *select only* [HQL queries](http://docs.jboss.org/hibernate/orm/3.3/reference/en/html/queryhql.html) can be executed
+
+#### Query#findByQuery
+
+This is the general Query method. 
+
++ *URL*:query/{q}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : {entities : [entity]}
+
 
 ### WCAG2
 
 Provides functionality for getting information about testing requirements including WCAG Principles Guidelines, Success Criteria, HTML techniques, CSS techniques etc.
 
+#### WCAG2#getWCAG2TreeData
+
+Get the WCAG2 Principles/geuidelines/SuccessCriteria TreeNodeData given the conformance level (A | AA | AAA)
+
++ *URL*:wcag2/browse/wcag2/tree/{level}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : TreeNodeData
+
+#### WCAG2#getWebtechsTreeData
+
+Get the Web Technologies (Technologies Techniques) TreeNodeData
+
++ *URL*:wcag2/browse/webtechs/tree
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : TreeNodeData
+
+#### WCAG2#getWebTechnologiesWithTechniquesTreeData
+
+Get the Web Technologies (Technologies Techniques) TreeNodeData
+
++ *URL*:wcag2/browse/webtechswithtechniques/tree
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : TreeNodeData
+
+#### WCAG2#findTechniquesByWebTechNameId
+
+Get the Techniques by web technology name id (e.g WCAG20-ARIA-TECHS)
+
++ *URL*:wcag2/techniques/{nameId}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : {entities: [Technique]}
+
+#### WCAG2#getAllTechniques
+
+Get the Techniques by web technology name id (e.g WCAG20-ARIA-TECHS)
+
++ *URL*:wcag2/techniques
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : {entities: [Technique]}
+
+#### WCAG2#getTechniqueById
+
+Get Technique by DB id
+
++ *URL*:wcag2/technique/byid/{id}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : {entities: [Technique]}
+
+#### WCAG2#getTechniqueByTerm
+
+Get Technique by term
+
++ *URL*:wcag2/technique/byid/{id}
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of Techniques
+
+#### WCAG2#getAllPrinciples
+
+Get All Principles
+
++ *URL*:wcag2/principles
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of Principles
+
+#### WCAG2#getAllGuidelines
+
+Get All Guidelines
+
++ *URL*:wcag2/guidelines
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of Guidelines
+
+#### WCAG2#getAllSuccessCriteria
+
+Get All Principles
+
++ *URL*:wcag2/criteria
++ *Method*: GET
++ *Request Data Type*:  
++ *Response HTTP Status*:  OK=200
++ *Response Entity* : List of SuccessCriteria
 
 ### Testresult 
 
 Provides functionality for managing the Test Results
 
-### Query
 
-Provides a way of read only querying the database from the client using HQL
+### Admin
+
+
+### AdminTechniques
+
 
 ### Rating
 

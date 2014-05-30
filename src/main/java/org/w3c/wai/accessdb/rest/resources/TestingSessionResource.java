@@ -47,7 +47,7 @@ public class TestingSessionResource {
 	}
 
 	/**
-	 * Gets a session object by session id.
+	 * Gets a session object by session id or create a new of not exists.
 	 * @param sessionid
 	 * @return
 	 */
@@ -57,8 +57,10 @@ public class TestingSessionResource {
 	public Response getSession(@PathParam("sessionid") String sessionid) {
 		TestingSession s = null;
 		s = TestingSessionService.INSTANCE.getSession(sessionid);
-		if(s==null)
-			return Response.status(Status.NO_CONTENT).build();
+		if(s==null){
+			s = TestingSessionService.INSTANCE.createNewSession();
+			return Response.status(Status.CREATED).entity(s).build();
+		}
 		else
 			return Response.status(Status.OK).entity(s).build();
 	}

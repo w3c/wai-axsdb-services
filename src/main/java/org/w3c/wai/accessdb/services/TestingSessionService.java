@@ -106,6 +106,24 @@ public enum TestingSessionService {
 		return session;
 	}
 
+	public TestingSession createNewSession(){
+		TestingSession s = new TestingSession();
+		String sessionid=UUID.randomUUID().toString();
+		while(!this.isSessionIdUnique(sessionid)){
+			logger.debug("TestingSession not unique with id:" + sessionid);
+			sessionid=UUID.randomUUID().toString();
+		}
+		logger.debug("New TestingSession with id:" + sessionid);
+		s.setSessionId(sessionid.toString());
+		return s;
+	}
+	private boolean isSessionIdUnique(String sessionid){
+		if (this.authenicatedSessions.containsKey(sessionid))
+			return false;
+		if (this.sessions.containsKey(sessionid))
+			return false;
+		return true;
+	}
 	public TestingSession saveSessionData(String sessionid) {
 		TestingSession session = this.sessions.get(sessionid);
 		String unregistered_user_id=null;

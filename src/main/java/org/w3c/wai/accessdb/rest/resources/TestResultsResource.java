@@ -35,7 +35,7 @@ public class TestResultsResource {
 	@Path("commit/bunch")
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response save(TestResultsBunch testResultsBunch) {
+	public Response saveBunch(TestResultsBunch testResultsBunch) {
 		try{
 			if(testResultsBunch.getResults().size()>0)
 			{

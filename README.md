@@ -4,7 +4,7 @@ This is the server side of the Accessibility Support Database offering CRUD REST
 Project page: http://www.w3.org/WAI/ACT/
 
 ## Table of Contents
-
+<!-- toc -->
   * [REST API](#rest-api)
     * [TestingSession](#testingsession)
       * [TestingSession#save](#testingsessionsave)
@@ -88,12 +88,12 @@ Add a session to the server side session pool. If there is no session id an id i
 
 #### TestingSession#getSession
 
-Gets a session object by session id.
+Gets a session object by session id or create a new of not exists.
 
 + *URL*: testingsession/browse/{sessionid}
 + *Method*: GET
 + *Request Data Type*: Null
-+ *Response HTTP Status*: OK=200 | NOT_FOUND: 404
++ *Response HTTP Status*: OK=200 | CREATED=201
 + *Response Entity*: TestingSession
 
 #### TestingSession#login
@@ -450,6 +450,17 @@ Get All Principles
 ### Testresult 
 
 Provides functionality for managing the Test Results
+
+#### Testresult#saveBunch
+
+Save a bunch of test results
+
++ *URL*: testresult/commit/bunch
++ *Method*: PoST
++ *Request Data Type*:  TestResultsBunch
++ *Response HTTP Status*:  OK=200 |  NO_CONTENT=204 | NOT_MODIFIED=304
++ *Response Entity* : TestResultsBunch ID
+
 
 
 ### Admin

@@ -519,6 +519,26 @@ Get unique Platforms (Operating Systems) as TreeDataNode that appear in test res
 + *Response HTTP Status*:  OK
 + *Response Entity* : treeNodeData
 
+#### Testresult#findByFilterTestResultTechniqueOveview
+
+Top level results view: by technique overall pass and fail 
+
++ *URL*: testresult/browse/bytechnique/overview
++ *Method*: PoST
++ *Request Data Type*:  Filter
++ *Response HTTP Status*:  OK
++ *Response Entity* : [TestResultDataOverview]
+
+#### Testresult#findByFilterTestResultTestOveview
+
+Second level results view: by Test of specific technique overall pass and fail 
+
++ *URL*: testresult/browse/bytest/overview/{techNameId}
++ *Method*: PoST
++ *Request Data Type*:  Filter
++ *Response HTTP Status*:  OK
++ *Response Entity* : [TestResultTestOveview]
+
 
 
 ### Admin
@@ -617,6 +637,19 @@ Provides functionality for managing any rating (test case or test result)
     "language":"en"
  }
 
+ testResultDataOverview : {
+    technique:"", 
+    techiqueTitle:"", 
+    noOfPass:"", 
+    noOfFail:""
+   }
+   
+ TestResultTestOveview: {
+    testUnitId:"", 
+    testTitle:"", 
+    noOfPass:"", 
+    noOfFail:""
+ }
 
 ``` 
 

@@ -53,6 +53,8 @@ Project page: http://www.w3.org/WAI/ACT/
     * [Testresult#getATTree](#testresultgetattree)
     * [Testresult#getUATree](#testresultgetuatree)
     * [Testresult#getOSTree](#testresultgetostree)
+    * [Testresult#findByFilterTestResultTechniqueOveview](#testresultfindbyfiltertestresulttechniqueoveview)
+    * [Testresult#findByFilterTestResultTestOveview](#testresultfindbyfiltertestresulttestoveview)
   * [Admin](#admin)
   * [AdminTechniques](#admintechniques)
   * [Rating](#rating)

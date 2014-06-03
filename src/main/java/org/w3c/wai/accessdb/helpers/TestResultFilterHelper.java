@@ -71,6 +71,24 @@ public class TestResultFilterHelper
         return sql.toString();
     }
 
+    public static String buildHQL4CountAllTestResultsOfTestUnit(TestResultFilter filter, String testUnitId)
+    {
+    	StringBuffer sql = new StringBuffer();
+        sql.append("select count(DISTINCT res) from TestResult as res");
+        sql.append(" where res.testUnitDescription.testUnitId=" + "'"+ testUnitId + "' ");
+        sql.append(" and res in ("+ TestResultFilterHelper.buildHQL4TestResults(filter) + ")");
+        return sql.toString();     
+    }
+    public static String buildHQL4CountPassTestResultsOfTestUnit(TestResultFilter filter, String testUnitId)
+    {
+    	StringBuffer sql = new StringBuffer();
+        sql.append("select count(DISTINCT res) from TestResult as res ");
+        sql.append(" where res.testUnitDescription.testUnitId=" + "'"+ testUnitId + "' ");
+        sql.append(" AND res.resultValue=" + true + " ");
+        sql.append(" and res in ("+ TestResultFilterHelper.buildHQL4TestResults(filter) + ")");
+        return sql.toString();
+    }
+    
     public static String buildHQL4TestResultsOverviewPass(
             TestResultFilter filter, String techId)
     {
@@ -102,8 +120,10 @@ public class TestResultFilterHelper
         return sql.toString();
 
     }
+
     
 
+    
     public static String buildHQL4Technique(TestResultFilter filter)
     {
         StringBuffer sql = new StringBuffer();

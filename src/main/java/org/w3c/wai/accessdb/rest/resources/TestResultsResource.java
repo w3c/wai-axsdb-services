@@ -1,6 +1,5 @@
 package org.w3c.wai.accessdb.rest.resources;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
@@ -11,12 +10,14 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.jaxb.ElementWrapper;
 import org.w3c.wai.accessdb.jaxb.TestResultDataOverview;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
 import org.w3c.wai.accessdb.jaxb.TestResultFullViewTechnique;
+import org.w3c.wai.accessdb.jaxb.TestResultTestOveview;
 import org.w3c.wai.accessdb.jaxb.TestResultViewData;
 import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.om.TestResultsBunch;
@@ -31,6 +32,11 @@ import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 @Path("testresult")
 public class TestResultsResource {
 	
+	/**
+	 * Save a bunch of test results
+	 * @param testResultsBunch
+	 * @return
+	 */
 	@POST
 	@Path("commit/bunch")
 	@Produces({ MediaType.APPLICATION_JSON })
@@ -49,6 +55,118 @@ public class TestResultsResource {
 			return Response.notModified(e.getLocalizedMessage()).build();
 		}		
 	}
+	/**
+	 * Get unique Assistive Technologies as TreeDataNode that appear in test results in DB based on the given filter 
+	 * @param filter
+	 * @return
+	 */
+	@Path("browse/at/tree")
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    public Response getATTree(TestResultFilter filter) {
+        return Response.ok(ATService.INSTANCE.getATNode(filter)).build();
+    }
+	
+	/**
+	 * 	Get unique User Agents (Browsers) as TreeDataNode that appear in test results in DB based on the given filter 
+	 * @param filter
+	 * @return
+	 */
+	@Path("browse/ua/tree")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public Response getUATree(TestResultFilter filter) {
+		return Response.ok(ATService.INSTANCE.getUANode(filter)).build();
+	}
+	
+	/**
+	 * 	Get unique Platforms (Operating Systems) as TreeDataNode that appear in test results in DB based on the given filter 
+	 * @param filter
+	 * @return
+	 */
+	@Path("browse/os/tree")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	@Consumes({ MediaType.APPLICATION_JSON })
+	public Response getOSTree(TestResultFilter filter) {
+		return Response.ok(ATService.INSTANCE.getOSNode(filter)).build();
+	}
+	/**
+	 * 	Get unique Platforms (Operating Systems) as TreeDataNode that appear in test results in DB based on the given filter  
+	 * @return
+	 */
+	@Path("browse/technologies/tree")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response getTechnologiesTree() {
+		return Response.ok(ATService.INSTANCE.getTechnologiesTree()).build();
+	}
+	
+	/**
+	 * Get TestResult by DB Id
+	 * @param id
+	 * @return
+	 */
+	@Path("{id}")
+	@GET
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response findById(@PathParam("id") String id) {
+		TestResult r =  null;
+		try{
+			r = EAOManager.INSTANCE.getTestResultEAO().findById(
+					Long.parseLong(id));
+		}
+		catch(Exception e){
+			return Response.status(Status.BAD_REQUEST).entity(id).build();
+		}
+		if(r==null)
+			return Response.status(Status.NOT_FOUND).entity(id).build();
+		return Response.status(Status.OK).entity(r).build();
+	}
+	/**
+	 * Find test results based on filter
+	 * @param filter
+	 * @return
+	 */
+	@Path("filter")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response findByFilter(TestResultFilter filter) {
+		List<TestResult> results = TestResultsService.INSTANCE.getResults(filter);
+		return Response.status(Status.OK).entity(results).build();
+	}
+	/**
+	 * Top level results view: by technique overall pass and fail 
+	 * @param filter
+	 * @return
+	 */
+	@Path("browse/bytechnique/overview")
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    public Response findByFilterTestResultTechniqueOveview(TestResultFilter filter) {
+        List<TestResultDataOverview> res = TestResultsService.INSTANCE.loadTestResultDataOverview(filter);
+        return Response.ok(new ElementWrapper<TestResultDataOverview>(res)).build();
+    }	
+	
+	/**
+	 * Second level results view: by testunit overall pass and fail 
+	 * @param filter
+	 * @return
+	 */
+	@Path("browse/bytest/overview/{techNameId}")
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    public Response findByFilterTestResultTestOveview(TestResultFilter filter, @PathParam("techNameId") String techNameId) {
+        List<TestResultTestOveview> res = TestResultsService.INSTANCE.findByFilterTestResultTestOveview(filter, techNameId);
+        return Response.ok(new ElementWrapper<TestResultTestOveview>(res)).build();
+    }	
+	
+	
+	
 	
 	@Path("browse/resultsview/{techid}")
 	@POST
@@ -59,14 +177,7 @@ public class TestResultsResource {
 		return Response.ok(new ElementWrapper<TestResultViewData>(res)).build();
 	}
 	
-	@Path("browse/dataoverview")
-    @POST
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Consumes({ MediaType.APPLICATION_JSON })
-    public Response loadTestResultDataOverview(TestResultFilter filter) {
-        List<TestResultDataOverview> res = TestResultsService.INSTANCE.loadTestResultDataOverview(filter);
-        return Response.ok(new ElementWrapper<TestResultDataOverview>(res)).build();
-    }
+
 	
 	@Path("browse/fullviewtechnique/{techid}")
     @POST
@@ -82,90 +193,5 @@ public class TestResultsResource {
 	        return Response.serverError().entity(e.getStackTrace()).build();
 	    }
     }
-	
-	@Path("browse/at/tree")
-    @POST
-    @Produces({ MediaType.APPLICATION_JSON })
-    @Consumes({ MediaType.APPLICATION_JSON })
-    public Response getATTree(TestResultFilter filter) {
-        return Response.ok(ATService.INSTANCE.getATNode(filter)).build();
-    }
-	
-	@Path("browse/ua/tree")
-	@POST
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response getUATree(TestResultFilter filter) {
-		return Response.ok(ATService.INSTANCE.getUANode(filter)).build();
-	}
-	
-	@Path("browse/os/tree")
-	@POST
-	@Produces({ MediaType.APPLICATION_JSON })
-	@Consumes({ MediaType.APPLICATION_JSON })
-	public Response getOSTree(TestResultFilter filter) {
-		return Response.ok(ATService.INSTANCE.getOSNode(filter)).build();
-	}
-	
-	@Path("browse/technologies/tree")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getTechnologiesTree() {
-		return Response.ok(ATService.INSTANCE.getTechnologiesTree()).build();
-	}
-	
-	@Path("browse")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public ElementWrapper<TestResult> findAll() {
-		return new ElementWrapper<TestResult>(EAOManager.INSTANCE
-				.getTestResultEAO().findAll());
-	}
-	@Path("browse/byquery/{q}")
-	@GET	
-	@Produces({ MediaType.APPLICATION_JSON })
-	public Response getTestResultsByQuery(@PathParam("q") String q) {
-		List<TestResult> res = new ArrayList<TestResult>();
-		try{
-			res = EAOManager.INSTANCE.getTestResultEAO().doSimpleSelectOnlyQuery(q);	
-		}
-		catch(Exception e)
-		{
-			return Response.serverError().build();
-		}
-		return Response.ok(new ElementWrapper<TestResult>(res)).build();
-	}
 
-	@Path("browse/testsuite/{tsId}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public ElementWrapper<TestResult> findTestResultsByTestSuiteId(
-			@PathParam("id") String id) {
-		return new ElementWrapper<TestResult>(EAOManager.INSTANCE
-				.getTestResultEAO().findAll());
-	}
-
-	@Path("browse/{id}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public TestResult getTestResult(@PathParam("id") String id) {
-		return EAOManager.INSTANCE.getTestResultEAO().findById(
-				Long.parseLong(id));
-	}
-
-	/*@Path("browse/testunit/{id}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public List<TestResult> findTestResultsByTestUnitId(
-			@PathParam("id") String id) {
-		return EAOManager.INSTANCE.getTestResultEAO().findByTestUnitId(id);
-	}
-
-	@Path("browse/testprofile/{id}")
-	@GET
-	@Produces({ MediaType.APPLICATION_JSON })
-	public List<TestResult> findTestResultsByTestProfiled(
-			@PathParam("id") String id) {
-		return EAOManager.INSTANCE.getTestResultEAO().findByTestProfileId(id);
-	}*/
 }

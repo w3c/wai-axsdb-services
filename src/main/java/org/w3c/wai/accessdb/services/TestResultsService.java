@@ -23,8 +23,8 @@ import org.w3c.wai.accessdb.jaxb.TestResultDataOverview;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
 import org.w3c.wai.accessdb.jaxb.TestResultFullViewTechnique;
 import org.w3c.wai.accessdb.jaxb.TestResultFullViewTechniqueCell;
+import org.w3c.wai.accessdb.jaxb.TestResultTestOveview;
 import org.w3c.wai.accessdb.jaxb.TestResultViewData;
-import org.w3c.wai.accessdb.jaxb.TreeNodeData;
 import org.w3c.wai.accessdb.om.Technique;
 import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.om.TestResultsBunch;
@@ -64,29 +64,23 @@ public enum TestResultsService {
 		}
 		return dataList;
 	}
-	/*
-	public List<TestResultViewData> loadTestResultByTestcaseViewData(
-			TestResultFilter filter, String techId) {
-		List<TestResultViewData> dataList = new ArrayList<TestResultViewData>();
-		List<Object[]> results = null;
-		try {
-			String q = TestResultFilterHelper.buildHQL4TestResultViewTechnique(
-					filter, techId);
-			logger.debug("loadTestResultView Query: " + q);
-			results = (List<Object[]>) EAOManager.INSTANCE.getTestResultEAO()
-					.doSimpleQuery(q);
-			logger.debug("loadTestResultView results: " + results.size());
 
-		} catch (Exception e) {
-			logger.error(e.getLocalizedMessage());
-		}
-		for (Object[] result : results) {
-			TestResultViewData data = new TestResultViewData(result, techId);
-			dataList.add(data);
-		}
-		return dataList;
-	}
-*/
+	/*
+	 * public List<TestResultViewData> loadTestResultByTestcaseViewData(
+	 * TestResultFilter filter, String techId) { List<TestResultViewData>
+	 * dataList = new ArrayList<TestResultViewData>(); List<Object[]> results =
+	 * null; try { String q =
+	 * TestResultFilterHelper.buildHQL4TestResultViewTechnique( filter, techId);
+	 * logger.debug("loadTestResultView Query: " + q); results =
+	 * (List<Object[]>) EAOManager.INSTANCE.getTestResultEAO()
+	 * .doSimpleQuery(q); logger.debug("loadTestResultView results: " +
+	 * results.size());
+	 * 
+	 * } catch (Exception e) { logger.error(e.getLocalizedMessage()); } for
+	 * (Object[] result : results) { TestResultViewData data = new
+	 * TestResultViewData(result, techId); dataList.add(data); } return
+	 * dataList; }
+	 */
 	public TestResultFullViewTechnique loadTestResultFullViewTechnique(
 			TestResultFilter filter, String techId) {
 		// find unique combinations based on filter and technique
@@ -165,6 +159,13 @@ public enum TestResultsService {
 		return view;
 	}
 
+	/**
+	 * Get overall results for every technique based on filter. This returns
+	 * technique info, pass and fail
+	 * 
+	 * @param filter
+	 * @return
+	 */
 	public List<TestResultDataOverview> loadTestResultDataOverview(
 			TestResultFilter filter) {
 		List<TestResultDataOverview> results = new ArrayList<TestResultDataOverview>();
@@ -192,23 +193,49 @@ public enum TestResultsService {
 			res.setNoOfPass(noOfPass);
 			res.setTechniqueTitle(technique.getTitle());
 			/*
-			res.setNoOfUniqueCombinations(EAOManager.INSTANCE
-					.getTestResultEAO().countUniqueATCombinationsByTechnique(
-							namedId));
-			res.setNoOfUniqueContributors(EAOManager.INSTANCE
-					.getTestResultEAO().countUniqueContributorsByTechnique(
-							namedId));
-							*/
+			 * res.setNoOfUniqueCombinations(EAOManager.INSTANCE
+			 * .getTestResultEAO().countUniqueATCombinationsByTechnique(
+			 * namedId)); res.setNoOfUniqueContributors(EAOManager.INSTANCE
+			 * .getTestResultEAO().countUniqueContributorsByTechnique(
+			 * namedId));
+			 */
 			results.add(res);
 			logger.debug(res.toString());
 		}
 		return results;
 	}
 
-	public TreeNodeData getResultsNode(TestResultFilter filter) {
-		TreeNodeData rootNode = new TreeNodeData();
-		rootNode.setType("ROOT");
+	public List<TestResultTestOveview> findByFilterTestResultTestOveview(
+			TestResultFilter filter, String techniqueNameId) {
+		List<TestResultTestOveview> resultsData = new ArrayList<TestResultTestOveview>();
+		List<TestUnitDescription> test = EAOManager.INSTANCE
+				.getTestUnitDescriptionEAO().findByTechnique(techniqueNameId);
+		for (Iterator<TestUnitDescription> iterator = test.iterator(); iterator
+				.hasNext();) {
+			TestUnitDescription tu = (TestUnitDescription) iterator.next();
+			TestResultTestOveview res = new TestResultTestOveview();
+			String testUnitId = tu.getTestUnitId();
+			String qAll = TestResultFilterHelper
+					.buildHQL4CountAllTestResultsOfTestUnit(filter, testUnitId);
+			logger.debug(qAll);
+			String noOfAll = String.valueOf(EAOManager.INSTANCE
+					.getTestResultEAO().doSimpleQuery(qAll).get(0));
+			String qPass = TestResultFilterHelper
+					.buildHQL4CountPassTestResultsOfTestUnit(filter, testUnitId);
+			logger.debug(qAll);
+			String noOfPass = String.valueOf(EAOManager.INSTANCE
+					.getTestResultEAO().doSimpleQuery(qPass).get(0));
+			res.setNoOfAll(noOfAll);
+			res.setNoOfPass(noOfPass);
+			res.setTestUnitId(testUnitId);
+			res.setTestTitle(tu.getTitle());
+			resultsData.add(res);
+			logger.debug(res.toString());
+		}
+		return resultsData;
+	}
 
+	public List<TestResult> getResults(TestResultFilter filter) {
 		List<TestResult> results = new ArrayList<TestResult>();
 		try {
 			String q = TestResultFilterHelper.buildHQL4TestResults(filter);
@@ -219,7 +246,7 @@ public enum TestResultsService {
 		}
 		logger.info("getResultsNode combinations from database: "
 				+ results.size());
-		return rootNode;
+		return results;
 	}
 
 	public TestResultsBunch saveResultsBunch(TestResultsBunch testResultsBunch)
@@ -266,10 +293,12 @@ public enum TestResultsService {
 			EAOManager.INSTANCE.getTestResultsBunchEAO().persist(b);
 			EAOManager.INSTANCE.getTestResultEAO().delete(testResult);
 		}
-		
+
 	}
-	public boolean importAllTestResults(String indexFilePath) throws ASBPersistenceException {
-		try{
+
+	public boolean importAllTestResults(String indexFilePath)
+			throws ASBPersistenceException {
+		try {
 			File indexF = new File(indexFilePath);
 			ExportTestResultsFile indexFile = new ExportTestResultsFile();
 			indexFile = (ExportTestResultsFile) JAXBUtils.fileToObject(indexF,
@@ -281,24 +310,30 @@ public enum TestResultsService {
 			for (TestResultsBunch bunch : indexFile.getTestResultsBunch()) {
 				String userId = bunch.getUser().getUserId();
 				TestResultsBunch b = new TestResultsBunch();
-				User user = EAOManager.INSTANCE.getUserEAO().findByUserId(userId);
-				if(user==null){
-					logger.warn("User not found: " + userId );
-					user = EAOManager.INSTANCE.getUserEAO().findByUserId("anon");
+				User user = EAOManager.INSTANCE.getUserEAO().findByUserId(
+						userId);
+				if (user == null) {
+					logger.warn("User not found: " + userId);
+					user = EAOManager.INSTANCE.getUserEAO()
+							.findByUserId("anon");
 					logger.warn("Anon user used");
 				}
 				b.setUser(user);
 				b.setDate(bunch.getDate());
 				b.setOptionalName(bunch.getOptionalName());
-				if(b.getOptionalName()==null){
+				if (b.getOptionalName() == null) {
 					b.setOptionalName("imported");
 				}
 				List<TestResult> rs = new ArrayList<TestResult>();
-				for(TestResult res : bunch.getResults()){
+				for (TestResult res : bunch.getResults()) {
 					TestResult r = new TestResult();
-					TestUnitDescription tu = EAOManager.INSTANCE.getTestUnitDescriptionEAO().findByTestUnitId(res.getTestUnitDescription().getTestUnitId());
-					if(tu==null){
-						logger.warn("Test not found in db: " + tu.getTestUnitId());
+					TestUnitDescription tu = EAOManager.INSTANCE
+							.getTestUnitDescriptionEAO().findByTestUnitId(
+									res.getTestUnitDescription()
+											.getTestUnitId());
+					if (tu == null) {
+						logger.warn("Test not found in db: "
+								+ tu.getTestUnitId());
 						continue;
 					}
 					r.setTestUnitDescription(tu);
@@ -306,16 +341,16 @@ public enum TestResultsService {
 					r.setResultValue(res.isResultValue());
 					r.setRunDate(res.getRunDate());
 					r.setTestingProfile(res.getTestingProfile());
-					logger.info("Addition result for test: " + r.getTestUnitDescription().getTestUnitId());
+					logger.info("Addition result for test: "
+							+ r.getTestUnitDescription().getTestUnitId());
 					rs.add(r);
 				}
 				logger.info("Saving...");
 				this.saveResultsBunch(b);
 				logger.info("Saved successfully...");
 			}
-			return true;	
-		}
-		catch(Exception e){
+			return true;
+		} catch (Exception e) {
 			logger.error("Unexpect import error: " + e.getLocalizedMessage());
 			logger.debug("Unexpect import error: ", e.getStackTrace());
 			return false;
@@ -340,13 +375,16 @@ public enum TestResultsService {
 			logger.error("Cannot create export folder: " + targetExportPath);
 			logger.error(e.getLocalizedMessage());
 		}
-		List<TestResultsBunch> bunches = EAOManager.INSTANCE.getTestResultsBunchEAO().findAll();
+		List<TestResultsBunch> bunches = EAOManager.INSTANCE
+				.getTestResultsBunchEAO().findAll();
 		logger.info("no of bunchs " + bunches.size());
-		for (Iterator<TestResultsBunch> iterator = bunches.iterator(); iterator.hasNext();) {
+		for (Iterator<TestResultsBunch> iterator = bunches.iterator(); iterator
+				.hasNext();) {
 			TestResultsBunch testResultsBunch = (TestResultsBunch) iterator
 					.next();
 			List<TestResult> r = testResultsBunch.getResults();
-			logger.debug("Results for " + testResultsBunch.getId() + " " + r.size());
+			logger.debug("Results for " + testResultsBunch.getId() + " "
+					+ r.size());
 			indexFile.getTestResultsBunch().add(testResultsBunch);
 		}
 		try {

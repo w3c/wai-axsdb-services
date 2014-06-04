@@ -16,9 +16,9 @@ import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.jaxb.ElementWrapper;
 import org.w3c.wai.accessdb.jaxb.TestResultDataOverview;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
-import org.w3c.wai.accessdb.jaxb.TestResultFullViewTechnique;
 import org.w3c.wai.accessdb.jaxb.TestResultTestOveview;
 import org.w3c.wai.accessdb.jaxb.TestResultViewData;
+import org.w3c.wai.accessdb.jaxb.TestResultViewTable;
 import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.om.TestResultsBunch;
 import org.w3c.wai.accessdb.services.ATService;
@@ -185,7 +185,22 @@ public class TestResultsResource {
     @Consumes({ MediaType.APPLICATION_JSON })
     public Response loadTestResultFullViewTechnique(TestResultFilter filter,@PathParam("techid") String techid) {
 	    try{
-	        TestResultFullViewTechnique res = TestResultsService.INSTANCE.loadTestResultFullViewTechnique(filter, techid);
+	    	TestResultViewTable res = TestResultsService.INSTANCE.loadTestResultFullViewTechnique(filter, techid);
+	        return Response.ok(res).build();
+	    }
+	    catch(Exception e)
+	    {
+	        return Response.serverError().entity(e.getStackTrace()).build();
+	    }
+    }
+	 
+	@Path("browse/fullviewtest/{testUnitId}")
+    @POST
+    @Produces({ MediaType.APPLICATION_JSON })
+    @Consumes({ MediaType.APPLICATION_JSON })
+    public Response loadTestResultFullViewTest(TestResultFilter filter,@PathParam("testUnitId") String testUnitId) {
+	    try{
+	        TestResultViewTable res = TestResultsService.INSTANCE.loadTestResultViewTest(filter, testUnitId);
 	        return Response.ok(res).build();
 	    }
 	    catch(Exception e)
@@ -194,4 +209,5 @@ public class TestResultsResource {
 	    }
     }
 
+	//TODO: make generic with new filter
 }

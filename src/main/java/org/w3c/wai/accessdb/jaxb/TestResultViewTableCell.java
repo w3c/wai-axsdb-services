@@ -6,7 +6,7 @@ import org.w3c.wai.accessdb.om.product.Product;
 import org.w3c.wai.accessdb.utils.JAXBUtils;
 
 @XmlRootElement
-public class TestResultFullViewTechniqueCell 
+public class TestResultViewTableCell 
 {
     public static final String TYPE_HEADER = "th";
     public static final String TYPE_DATA = "td";

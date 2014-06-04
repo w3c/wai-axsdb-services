@@ -22,6 +22,21 @@ public class TestResultFilter extends BaseEntity{
 	List<SimpleProduct> ats = new ArrayList<SimpleProduct>();
 	List<SimpleProduct> uas = new ArrayList<SimpleProduct>();
 	List<SimpleProduct> oss = new ArrayList<SimpleProduct>();
+	List<String> techniques = new ArrayList<String>();	
+	List<String> tests = new ArrayList<String>();	
+
+	public List<String> getTechniques() {
+		return techniques;
+	}
+	public void setTechniques(List<String> techniques) {
+		this.techniques = techniques;
+	}
+	public List<String> getTests() {
+		return tests;
+	}
+	public void setTests(List<String> tests) {
+		this.tests = tests;
+	}
 	public Date getLastModified() {
 		return lastModified;
 	}

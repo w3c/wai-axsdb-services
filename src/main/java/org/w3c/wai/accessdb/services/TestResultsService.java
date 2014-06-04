@@ -21,10 +21,10 @@ import org.w3c.wai.accessdb.jaxb.SimpleProduct;
 import org.w3c.wai.accessdb.jaxb.TechnologyCombination;
 import org.w3c.wai.accessdb.jaxb.TestResultDataOverview;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
-import org.w3c.wai.accessdb.jaxb.TestResultFullViewTechnique;
-import org.w3c.wai.accessdb.jaxb.TestResultFullViewTechniqueCell;
 import org.w3c.wai.accessdb.jaxb.TestResultTestOveview;
 import org.w3c.wai.accessdb.jaxb.TestResultViewData;
+import org.w3c.wai.accessdb.jaxb.TestResultViewTable;
+import org.w3c.wai.accessdb.jaxb.TestResultViewTableCell;
 import org.w3c.wai.accessdb.om.Technique;
 import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.om.TestResultsBunch;
@@ -65,27 +65,12 @@ public enum TestResultsService {
 		return dataList;
 	}
 
-	/*
-	 * public List<TestResultViewData> loadTestResultByTestcaseViewData(
-	 * TestResultFilter filter, String techId) { List<TestResultViewData>
-	 * dataList = new ArrayList<TestResultViewData>(); List<Object[]> results =
-	 * null; try { String q =
-	 * TestResultFilterHelper.buildHQL4TestResultViewTechnique( filter, techId);
-	 * logger.debug("loadTestResultView Query: " + q); results =
-	 * (List<Object[]>) EAOManager.INSTANCE.getTestResultEAO()
-	 * .doSimpleQuery(q); logger.debug("loadTestResultView results: " +
-	 * results.size());
-	 * 
-	 * } catch (Exception e) { logger.error(e.getLocalizedMessage()); } for
-	 * (Object[] result : results) { TestResultViewData data = new
-	 * TestResultViewData(result, techId); dataList.add(data); } return
-	 * dataList; }
-	 */
-	public TestResultFullViewTechnique loadTestResultFullViewTechnique(
+
+	public TestResultViewTable loadTestResultFullViewTechnique(
 			TestResultFilter filter, String techId) {
 		// find unique combinations based on filter and technique
-		TestResultFullViewTechnique view = new TestResultFullViewTechnique();
-		view.setTechniqueNameId(techId);
+		TestResultViewTable view = new TestResultViewTable();
+		view.setId(techId);
 		List<Object[]> atCombinations = null;
 		try {
 			String q = TestResultFilterHelper
@@ -112,27 +97,27 @@ public enum TestResultsService {
 		logger.debug("found unique UA combinations: " + agentsMap.size());
 		logger.debug("found unique AT combinations: " + atMap.size());
 		// for each comb get noOfPass and noOf Fail and build the table
-		List<TestResultFullViewTechniqueCell> firstRow = new ArrayList<TestResultFullViewTechniqueCell>();
-		TestResultFullViewTechniqueCell empty = new TestResultFullViewTechniqueCell();
-		empty.setType(TestResultFullViewTechniqueCell.TYPE_HEADER);
+		List<TestResultViewTableCell> firstRow = new ArrayList<TestResultViewTableCell>();
+		TestResultViewTableCell empty = new TestResultViewTableCell();
+		empty.setType(TestResultViewTableCell.TYPE_HEADER);
 		firstRow.add(empty);
 		for (String agentS : agentsMap.keySet()) {
-			TestResultFullViewTechniqueCell agentCell = new TestResultFullViewTechniqueCell();
-			agentCell.setType(TestResultFullViewTechniqueCell.TYPE_HEADER);
+			TestResultViewTableCell agentCell = new TestResultViewTableCell();
+			agentCell.setType(TestResultViewTableCell.TYPE_HEADER);
 			agentCell.setProduct(agentsMap.get(agentS));
 			firstRow.add(agentCell);
 		}
 		logger.debug("firstTableRow: " + firstRow);
 		view.getRows().add(firstRow);
 		for (String atS : atMap.keySet()) {
-			List<TestResultFullViewTechniqueCell> row = new ArrayList<TestResultFullViewTechniqueCell>();
-			TestResultFullViewTechniqueCell atCell = new TestResultFullViewTechniqueCell();
-			atCell.setType(TestResultFullViewTechniqueCell.TYPE_HEADER);
+			List<TestResultViewTableCell> row = new ArrayList<TestResultViewTableCell>();
+			TestResultViewTableCell atCell = new TestResultViewTableCell();
+			atCell.setType(TestResultViewTableCell.TYPE_HEADER);
 			atCell.setProduct(atMap.get(atS));
 			row.add(atCell);
 			for (String agentS : agentsMap.keySet()) {
-				TestResultFullViewTechniqueCell agentCell = new TestResultFullViewTechniqueCell();
-				agentCell.setType(TestResultFullViewTechniqueCell.TYPE_DATA);
+				TestResultViewTableCell agentCell = new TestResultViewTableCell();
+				agentCell.setType(TestResultViewTableCell.TYPE_DATA);
 				filter = new TestResultFilter();
 				filter.getAts().add(new SimpleProduct(atMap.get(atS)));
 				filter.getUas().add(new SimpleProduct(agentsMap.get(agentS)));
@@ -148,6 +133,84 @@ public enum TestResultsService {
 								TestResultFilterHelper
 										.buildHQL4TestResultsOverviewPass(
 												filter, techId)).get(0));
+				agentCell.setNoOfAll(noOfAll);
+				agentCell.setNoOfPass(noOfPass);
+				row.add(agentCell);
+			}
+			logger.debug("tableRow: " + row);
+			view.getRows().add(row);
+		}
+		logger.debug("tableView: " + view.toString());
+		return view;
+	}
+
+	public TestResultViewTable loadTestResultViewTest(
+			TestResultFilter filter, String testUnitId) {
+		// find unique combinations based on filter and technique
+		TestResultViewTable view = new TestResultViewTable();
+		view.setId(testUnitId);
+		List<Object[]> atCombinations = null;
+		try {
+			String q = TestResultFilterHelper
+					.buildHQL4TestResultViewTest(filter, testUnitId);
+			logger.info("loadTestResultViewTable Query: " + q);
+			atCombinations = (List<Object[]>) EAOManager.INSTANCE
+					.getTestResultEAO().doSimpleQuery(q);
+		} catch (Exception e) {
+			logger.warn(e.getLocalizedMessage());
+		}
+		logger.debug("getTestResultViewTable AT combinations: "
+				+ atCombinations.size());
+		// get Unique Agents and AT
+		HashMap<String, UAgent> agentsMap = new HashMap<String, UAgent>();
+		HashMap<String, AssistiveTechnology> atMap = new HashMap<String, AssistiveTechnology>();
+		for (Object[] combO : atCombinations) {
+			TechnologyCombination comb = new TechnologyCombination(combO);
+			UAgent uAgent = new UAgent(comb.getUaName(), comb.getUaVersion());
+			agentsMap.put(uAgent.toString(), uAgent);
+			AssistiveTechnology at = new AssistiveTechnology(comb.getAtName(),
+					comb.getAtVersion());
+			atMap.put(at.toString(), at);
+		}
+		logger.debug("found unique UA combinations: " + agentsMap.size());
+		logger.debug("found unique AT combinations: " + atMap.size());
+		// for each comb get noOfPass and noOf Fail and build the table
+		List<TestResultViewTableCell> firstRow = new ArrayList<TestResultViewTableCell>();
+		TestResultViewTableCell empty = new TestResultViewTableCell();
+		empty.setType(TestResultViewTableCell.TYPE_HEADER);
+		firstRow.add(empty);
+		for (String agentS : agentsMap.keySet()) {
+			TestResultViewTableCell agentCell = new TestResultViewTableCell();
+			agentCell.setType(TestResultViewTableCell.TYPE_HEADER);
+			agentCell.setProduct(agentsMap.get(agentS));
+			firstRow.add(agentCell);
+		}
+		logger.debug("firstTableRow: " + firstRow);
+		view.getRows().add(firstRow);
+		for (String atS : atMap.keySet()) {
+			List<TestResultViewTableCell> row = new ArrayList<TestResultViewTableCell>();
+			TestResultViewTableCell atCell = new TestResultViewTableCell();
+			atCell.setType(TestResultViewTableCell.TYPE_HEADER);
+			atCell.setProduct(atMap.get(atS));
+			row.add(atCell);
+			for (String agentS : agentsMap.keySet()) {
+				TestResultViewTableCell agentCell = new TestResultViewTableCell();
+				agentCell.setType(TestResultViewTableCell.TYPE_DATA);
+				filter = new TestResultFilter();
+				filter.getAts().add(new SimpleProduct(atMap.get(atS)));
+				filter.getUas().add(new SimpleProduct(agentsMap.get(agentS)));
+				String noOfAll = String.valueOf(EAOManager.INSTANCE
+						.getTestResultEAO()
+						.doSimpleQuery(
+								TestResultFilterHelper
+										.buildHQL4CountAllTestResultsOfTestUnit(
+												filter, testUnitId)).get(0));
+				String noOfPass = String.valueOf(EAOManager.INSTANCE
+						.getTestResultEAO()
+						.doSimpleQuery(
+								TestResultFilterHelper
+										.buildHQL4CountPassTestResultsOfTestUnit(
+												filter, testUnitId)).get(0));
 				agentCell.setNoOfAll(noOfAll);
 				agentCell.setNoOfPass(noOfPass);
 				row.add(agentCell);

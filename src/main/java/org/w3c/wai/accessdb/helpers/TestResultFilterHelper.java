@@ -58,6 +58,38 @@ public class TestResultFilterHelper
         }
         return sql.toString();
     }
+    public static String buildHQL4TestResultViewTest(
+            TestResultFilter filter, String testUnitId)
+    {
+        StringBuffer sql = new StringBuffer();
+        // get all AT combinations for filter/technique
+        sql.append("select DISTINCT res.testingProfile.assistiveTechnology.name as atName, "
+                + "res.testingProfile.assistiveTechnology.version.text as atVersion, "
+                + "res.testingProfile.userAgent.name as uaName, "
+                + "res.testingProfile.userAgent.version.text as uaVersion, "
+                + "res.testingProfile.platform.name as osName, "
+                + "res.testingProfile.platform.version.text as osVersion from TestResult as res "
+                + "where "
+                + " res.testUnitDescription.testUnitId = '" + testUnitId + "'");
+        // filter
+        if (filter.getAts().size() > 0)
+        {
+            sql.append(" AND ");
+            sql.append(getTestingProfileSubQuery(filter.getAts(),
+                    "assistiveTechnology","res"));
+        }
+        if (filter.getUas().size() > 0)
+        {           
+            sql.append(" AND ");
+            sql.append(getTestingProfileSubQuery(filter.getUas(), "userAgent","res"));
+        }
+        if (filter.getOss().size() > 0)
+        {           
+            sql.append(" AND ");
+            sql.append(getTestingProfileSubQuery(filter.getOss(), "platform","res"));
+        }
+        return sql.toString();
+    }
 
     public static String buildHQL4TestResultsOverviewAll(
             TestResultFilter filter, String techId)

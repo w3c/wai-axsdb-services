@@ -138,6 +138,18 @@ public class TestResultsResource {
 		return Response.status(Status.OK).entity(results).build();
 	}
 	/**
+	 * Find test results based on filter
+	 * @param filter
+	 * @return
+	 */
+	@Path("filter/test/{testUnitId}")
+	@POST
+	@Produces({ MediaType.APPLICATION_JSON })
+	public Response findByTestAndFilter(TestResultFilter filter,@PathParam("testUnitId") String testUnitId) {
+		List<TestResult> results = TestResultsService.INSTANCE.getResults(filter);
+		return Response.status(Status.OK).entity(results).build();
+	}
+	/**
 	 * Top level results view: by technique overall pass and fail 
 	 * @param filter
 	 * @return

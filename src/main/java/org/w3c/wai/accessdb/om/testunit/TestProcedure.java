@@ -1,5 +1,6 @@
 package org.w3c.wai.accessdb.om.testunit;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -44,7 +45,7 @@ import javax.xml.bind.annotation.XmlType;
     "expectedResult"
 })
 @Embeddable
-public class TestProcedure{
+public class TestProcedure implements Serializable{
 
 	@OneToMany(fetch=FetchType.EAGER,cascade=CascadeType.ALL)	
 	@OrderBy("id ASC")

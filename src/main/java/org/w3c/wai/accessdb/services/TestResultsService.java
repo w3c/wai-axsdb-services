@@ -64,6 +64,29 @@ public enum TestResultsService {
 		}
 		return dataList;
 	}
+	public List<TestResultViewData> loadTestResultViewData(
+			TestResultFilter filter) {
+		List<TestResultViewData> dataList = new ArrayList<TestResultViewData>();
+		List<Object[]> results = null;
+		try {
+			String q = TestResultFilterHelper.buildHQL4TestResultView(
+					filter);
+			logger.debug("loadTestResultView Query: " + q);
+			results = (List<Object[]>) EAOManager.INSTANCE.getTestResultEAO()
+					.doSimpleQuery(q);
+			logger.debug("loadTestResultView results: " + results.size());
+			for (Object[] result : results) {
+				TestResultViewData data = new TestResultViewData(result, null);
+				dataList.add(data);
+			}
+		} catch (Exception e) {
+			logger.error(e.getMessage());
+			
+		}
+		
+		return dataList;
+	}
+	
 
 
 	public TestResultViewTable loadTestResultFullViewTechnique(

@@ -17,6 +17,7 @@ import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.eao.EAOManager;
@@ -47,8 +48,11 @@ public enum TestsService {
 	INSTANCE;
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestsService.class);
-	private TestUnitDescriptionEAO eao = EAOManager.INSTANCE.getTestUnitDescriptionEAO();
+	private TestUnitDescriptionEAO eao = EAOManager.INSTANCE
+			.getTestUnitDescriptionEAO();
 	private String targetRootExportPath = "/tmp/accessdbexport/";
+
+	//FIXME
 	private String sourceExportTestFilesPath = "/var/www/testfiles";
 
 	public List<TestUnitDescription> findAllTestDescriptions() {
@@ -269,7 +273,7 @@ public enum TestsService {
 	}
 
 	public boolean importTests(String indexFilePath)
-			throws ASBPersistenceException {
+			throws ASBPersistenceException, JAXBException {
 		File indexF = new File(indexFilePath);
 		ExportTestFile indexFile = new ExportTestFile();
 		indexFile = (ExportTestFile) JAXBUtils.fileToObject(indexF,
@@ -278,70 +282,67 @@ public enum TestsService {
 			logger.error("Cannot load index file for importing");
 			return false;
 		}
-		String testpath = null;
+		String rootImportPath = indexF.getParent() + "/";
 		TestUnitDescription test = null;
 		for (String testPath : indexFile.getTests()) {
+			String metaPath = rootImportPath + testPath + "/meta.xml";
+			File metaFile = null;
 			try {
-					File metaFile = new File(testPath + "/meta.xml");
-					TestUnitDescription tu = (TestUnitDescription) JAXBUtils
-							.fileToObject(metaFile, TestUnitDescription.class);
-					if(EAOManager.INSTANCE.getTestUnitDescriptionEAO().findByTestUnitId(tu.getTestUnitId())!=null){
-						logger.warn(tu.getTestUnitId() +" is already there.. skipping.. ");
-						continue;
-					}
-					test = new TestUnitDescription();
-					String techId = tu.getTechnique().getNameId();
-					Technique technique = EAOManager.INSTANCE.getTechniqueEAO().findByNameId(techId);
-					test.setTechnique(technique);
-					test.setTestUnitId(tu.getTestUnitId());
-					test.setComment(tu.getComment());
-					test.setCreator(tu.getCreator());
-					test.setDescription(tu.getDescription());
-					test.setLanguage(tu.getLanguage());
-					test.setRights(tu.getRights());
-					test.setStatus(tu.getStatus());
-					test.setSubject(tu.getSubject());
-					test.setTitle(tu.getTitle());
-					test.setVersion(tu.getVersion());
-					TestProcedure tp = tu.getTestProcedure();
-					TestProcedure tpn = new TestProcedure();
-					tpn.setYesNoQuestion(tp.getYesNoQuestion());
-					tpn.setExpectedResult(tp.isExpectedResult());
-					Set<Step> steps = tp.getStep();
-					for (Iterator<Step> iterator = steps.iterator(); iterator.hasNext();) {
-						Step step = (Step) iterator.next();
-						step.setId(-1);
-						tpn.getStep().add(step);
-					}
-					test = TestsService.INSTANCE.insertTestUnit(test);
-					if(test!=null && test.getId()>0){
-						// copy files
-						//TODO: 
-						String path = TestUnitHelper
-								.getTestUnitFolderPath(test);
-						File targetExportFile = new File(path);
-						if (!targetExportFile.exists())
-							InOutUtils.makeDir(path);
-						testpath = techId + "/" + test.getTestUnitId();
-						File sourceExportTestFilesFile = new File(
-								sourceExportTestFilesPath + "/" + testpath);
-						InOutUtils.copyFolder(sourceExportTestFilesFile,
-								targetExportFile);
-						indexFile.getTests().add(testpath);
+				metaFile = new File(metaPath);
+				TestUnitDescription tu = (TestUnitDescription) JAXBUtils
+						.fileToObject(metaFile, TestUnitDescription.class);
+				if (EAOManager.INSTANCE.getTestUnitDescriptionEAO()
+						.findByTestUnitId(tu.getTestUnitId()) != null) {
+					logger.warn(tu.getTestUnitId()
+							+ " is already there.. skipping.. ");
+					continue;
+				}
+				String techId = tu.getTechnique().getNameId();
+				Technique technique = EAOManager.INSTANCE.getTechniqueEAO()
+						.findByNameId(techId);
+				if (technique == null) {
+					logger.warn(techId + " technique not exists.. skipping.. ");
+					continue;
+				}
+				test = TestUnitHelper.cloneTest(tu);
+				test.setTechnique(technique);
+				test = EAOManager.INSTANCE	.getTestUnitDescriptionEAO().persist(test);
+				if (test != null && test.getId() > 0) {
+					// copy files
+					File sourceTestFile = new File(rootImportPath + testPath + "/");
+					File targetTestFolder = new File(
+							TestUnitHelper.getTestUnitFolderPath(test));
+					if (!targetTestFolder.exists())
+						InOutUtils.makeDir(targetTestFolder.getAbsolutePath());
+					//copy test file
+					String srcPath = sourceTestFile.getAbsolutePath()+ "/" + test.getSubject().getTestFile().getSrc();
+					String destPath = targetTestFolder.getAbsolutePath() + "/" + test.getSubject().getTestFile().getSrc();
+					logger.info("cp "+srcPath+" --> "+destPath);
+					File srcFile = new File(srcPath);
+					File destFile = new File(destPath);
+					FileUtils.copyFile(srcFile, destFile);
+					List<RefFileType> rFs = test.getSubject().getResourceFiles();
+					for (RefFileType rf : rFs) {
+						if(rf.getSrc()==null || rf.getSrc().trim().length()<2)
+							continue;
+						srcPath = sourceTestFile.getAbsolutePath() + "/" + rf.getSrc();
+						destPath = targetTestFolder.getAbsolutePath()  + "/" + rf.getSrc();
+						logger.info("cp "+srcPath+" --> "+destPath);
+						srcFile = new File(srcPath);
+						destFile = new File(destPath);
+						FileUtils.copyFile(srcFile, destFile);
 					}
 				}
-				catch (IOException e) {
-						logger.error("Error while copying test files: " + testpath);
-						logger.debug(e.getLocalizedMessage());
-						this.deleteTestUnit(test);
-						logger.error("deleting also the meta for: " + test.getId());
-						continue;
-				}
-			}	
+			} catch (IOException e) {
+				logger.error("Error while copying test files: " + metaPath);
+				logger.debug(e.getLocalizedMessage());
+				this.deleteTestUnit(test);
+				logger.error("deleting also the meta for: " + test.getId());
+				continue;
+			}
+		}
 		return true;
 	}
-
-
 
 	public void test2XMLFile(TestUnitDescription test) throws IOException,
 			JAXBException {

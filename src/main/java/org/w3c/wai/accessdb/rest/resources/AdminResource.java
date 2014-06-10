@@ -8,17 +8,20 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.om.Technique;
+import org.w3c.wai.accessdb.services.DBInitService;
 import org.w3c.wai.accessdb.services.TechniquesService;
 import org.w3c.wai.accessdb.services.TestResultsService;
 import org.w3c.wai.accessdb.services.TestingSessionService;
 import org.w3c.wai.accessdb.services.TestsService;
 import org.w3c.wai.accessdb.sync.TechniquesSpecParser;
+import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 import org.w3c.wai.accessdb.utils.AuthenticationException;
 
 /**
@@ -31,14 +34,14 @@ public class AdminResource {
             .getLogger(AdminResource.class);
 	
 	//TODO: remove on production 
-/*	@Path("initdb")
+	@Path("initdb")
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response initDB() throws ASBPersistenceException {
         logger.info("starting init.");
 		DBInitService.INSTANCE.initAll();
 		return Response.ok().build();
-	}*/
+	}
 
 	@Path("export/tests")
 	@GET
@@ -70,10 +73,10 @@ public class AdminResource {
 			return Response.noContent().entity(e).build();
 		}
 	}
-	@Path("import/tests/{path}")
+	@Path("import/tests")
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response importAllTests(@PathParam("path") String path) {
+	public Response importAllTests(@QueryParam("path") String path) {
 		try {
 			logger.info("Start import");
 			TestsService.INSTANCE.importTests(path);
@@ -85,10 +88,10 @@ public class AdminResource {
 			return Response.noContent().entity(e).build();
 		}
 	}
-	@Path("import/testresults/{path}")
+	@Path("import/testresults")
 	@GET
 	@Produces({ MediaType.APPLICATION_JSON })
-	public Response importAllTestResults(@PathParam("path") String path) {
+	public Response importAllTestResults(@QueryParam("path") String path) {
 		try {
 			logger.info("Start import");
 			TestResultsService.INSTANCE.importAllTestResults(path);

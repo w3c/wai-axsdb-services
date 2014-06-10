@@ -2,8 +2,13 @@ package org.w3c.wai.accessdb.helpers;
 
 import java.io.File;
 
+import org.w3c.wai.accessdb.om.Technique;
+import org.w3c.wai.accessdb.om.testunit.RefFileType;
+import org.w3c.wai.accessdb.om.testunit.Step;
+import org.w3c.wai.accessdb.om.testunit.TestProcedure;
 import org.w3c.wai.accessdb.om.testunit.TestUnitDescription;
 import org.w3c.wai.accessdb.services.ConfigService;
+import org.w3c.wai.accessdb.utils.InOutUtils;
 
 public class TestUnitHelper {
 
@@ -31,6 +36,20 @@ public class TestUnitHelper {
 		String path = folderPref + webTechnologyPath + "/" + folderName + "/";
 		return path;
 	}
+	
 
+	public static TestUnitDescription cloneTest(TestUnitDescription tu){
+		TestUnitDescription test = (TestUnitDescription) InOutUtils.deepClone(tu);
+		test.setId(-1);
+		TestProcedure tp = test.getTestProcedure();
+		for (Step step : tp.getStep()) {
+			step.setId(-1);
+		}
+		test.getSubject().getTestFile().setId(-1);
+		for (RefFileType f : test.getSubject().getResourceFiles()) {
+			f.setId(-1);
+		}
+		return test;
+	}
 
 }

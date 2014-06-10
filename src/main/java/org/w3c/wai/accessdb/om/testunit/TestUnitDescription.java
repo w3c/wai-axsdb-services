@@ -52,7 +52,7 @@ import org.w3c.wai.accessdb.utils.DateAdapter;
 @XmlRootElement(name = "TestUnitDescription")
 @Entity
 @UniqueConstraint(columnNames = { "testUnitId" }) 
-public class TestUnitDescription extends BaseEntity{
+public class TestUnitDescription extends BaseEntity implements Cloneable{
     @XmlElement(required = true)
     private String title;
     @XmlElement(required = true)
@@ -377,7 +377,6 @@ public class TestUnitDescription extends BaseEntity{
 	public void setComment(String comment) {
 		this.comment = comment;
 	}
-
 }
 
   

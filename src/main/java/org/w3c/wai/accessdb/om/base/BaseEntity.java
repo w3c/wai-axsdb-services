@@ -3,6 +3,8 @@ package org.w3c.wai.accessdb.om.base;
 
 import static javax.persistence.GenerationType.AUTO;
 
+import java.io.Serializable;
+
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Inheritance;
@@ -14,7 +16,7 @@ import javax.persistence.MappedSuperclass;
  */
 @MappedSuperclass
 @Inheritance(strategy=InheritanceType.JOINED)
-public abstract class BaseEntity 
+public abstract class BaseEntity implements Serializable
 {
     @Id
     @GeneratedValue(strategy = AUTO)

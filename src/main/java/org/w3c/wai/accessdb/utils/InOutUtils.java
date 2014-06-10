@@ -1,11 +1,15 @@
 package org.w3c.wai.accessdb.utils;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.net.URI;
 import java.util.Deque;
@@ -19,6 +23,23 @@ import java.util.zip.ZipOutputStream;
 import javax.ws.rs.core.MultivaluedMap;
 
 public class InOutUtils {
+	/**
+	 * This method makes a "deep clone" of any Java object it is given.
+	 */
+	 public static Object deepClone(Object object) {
+	   try {
+	     ByteArrayOutputStream baos = new ByteArrayOutputStream();
+	     ObjectOutputStream oos = new ObjectOutputStream(baos);
+	     oos.writeObject(object);
+	     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+	     ObjectInputStream ois = new ObjectInputStream(bais);
+	     return ois.readObject();
+	   }
+	   catch (Exception e) {
+	     e.printStackTrace();
+	     return null;
+	   }
+	 }
 	/**
 	 * header sample { Content-Type=[image/png], Content-Disposition=[form-data;
 	 * name="file"; filename="filename.extension"] }

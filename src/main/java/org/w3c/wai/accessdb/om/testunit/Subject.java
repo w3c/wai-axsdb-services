@@ -1,4 +1,5 @@
 package org.w3c.wai.accessdb.om.testunit;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +18,7 @@ import javax.xml.bind.annotation.XmlType;
 @XmlRootElement
 @XmlType(name = "", propOrder = { "testFile", "resourceFiles"})
 @Embeddable
-public class Subject {
+public class Subject implements Serializable{
 	@XmlElement(required = true)
 	@OneToOne(cascade=CascadeType.ALL)
 	private RefFileType testFile;

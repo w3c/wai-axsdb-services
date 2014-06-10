@@ -81,17 +81,12 @@ public class JAXBUtils {
 		return o;
 	}
 
-	public static Object fileToObject(File file, Class theclass) {
+	public static Object fileToObject(File file, Class theclass) throws JAXBException {
 		Object o = null;
-		try {
 			JAXBContext jaxbContext = JAXBContext.newInstance(theclass);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
 			o = theclass.cast(jaxbUnmarshaller.unmarshal(file));
 
-		} catch (JAXBException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
 		return o;
 	}
 

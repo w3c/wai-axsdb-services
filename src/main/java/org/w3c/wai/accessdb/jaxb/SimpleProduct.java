@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 import org.w3c.wai.accessdb.om.product.Product;
 
 @XmlRootElement
-public class SimpleProduct {
+public class SimpleProduct { 
 	private int id;
 	private String type;
 	private String name;

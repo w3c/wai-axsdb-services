@@ -17,7 +17,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.helpers.TestResultFilterHelper;
+import org.w3c.wai.accessdb.helpers.TestUnitHelper;
 import org.w3c.wai.accessdb.jaxb.SimpleProduct;
+import org.w3c.wai.accessdb.jaxb.SimpleTestResult;
+import org.w3c.wai.accessdb.jaxb.SimpleTestResultsBunch;
 import org.w3c.wai.accessdb.jaxb.TechnologyCombination;
 import org.w3c.wai.accessdb.jaxb.TestResultDataOverview;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
@@ -64,13 +67,13 @@ public enum TestResultsService {
 		}
 		return dataList;
 	}
+
 	public List<TestResultViewData> loadTestResultViewData(
 			TestResultFilter filter) {
 		List<TestResultViewData> dataList = new ArrayList<TestResultViewData>();
 		List<Object[]> results = null;
 		try {
-			String q = TestResultFilterHelper.buildHQL4TestResultView(
-					filter);
+			String q = TestResultFilterHelper.buildHQL4TestResultView(filter);
 			logger.debug("loadTestResultView Query: " + q);
 			results = (List<Object[]>) EAOManager.INSTANCE.getTestResultEAO()
 					.doSimpleQuery(q);
@@ -81,13 +84,11 @@ public enum TestResultsService {
 			}
 		} catch (Exception e) {
 			logger.error(e.getMessage());
-			
+
 		}
-		
+
 		return dataList;
 	}
-	
-
 
 	public TestResultViewTable loadTestResultFullViewTechnique(
 			TestResultFilter filter, String techId) {
@@ -167,15 +168,15 @@ public enum TestResultsService {
 		return view;
 	}
 
-	public TestResultViewTable loadTestResultViewTest(
-			TestResultFilter filter, String testUnitId) {
+	public TestResultViewTable loadTestResultViewTest(TestResultFilter filter,
+			String testUnitId) {
 		// find unique combinations based on filter and technique
 		TestResultViewTable view = new TestResultViewTable();
 		view.setId(testUnitId);
 		List<Object[]> atCombinations = null;
 		try {
-			String q = TestResultFilterHelper
-					.buildHQL4TestResultViewTest(filter, testUnitId);
+			String q = TestResultFilterHelper.buildHQL4TestResultViewTest(
+					filter, testUnitId);
 			logger.info("loadTestResultViewTable Query: " + q);
 			atCombinations = (List<Object[]>) EAOManager.INSTANCE
 					.getTestResultEAO().doSimpleQuery(q);
@@ -222,18 +223,22 @@ public enum TestResultsService {
 				filter = new TestResultFilter();
 				filter.getAts().add(new SimpleProduct(atMap.get(atS)));
 				filter.getUas().add(new SimpleProduct(agentsMap.get(agentS)));
-				String noOfAll = String.valueOf(EAOManager.INSTANCE
-						.getTestResultEAO()
-						.doSimpleQuery(
-								TestResultFilterHelper
-										.buildHQL4CountAllTestResultsOfTestUnit(
-												filter, testUnitId)).get(0));
-				String noOfPass = String.valueOf(EAOManager.INSTANCE
-						.getTestResultEAO()
-						.doSimpleQuery(
-								TestResultFilterHelper
-										.buildHQL4CountPassTestResultsOfTestUnit(
-												filter, testUnitId)).get(0));
+				String noOfAll = String
+						.valueOf(EAOManager.INSTANCE
+								.getTestResultEAO()
+								.doSimpleQuery(
+										TestResultFilterHelper
+												.buildHQL4CountAllTestResultsOfTestUnit(
+														filter, testUnitId))
+								.get(0));
+				String noOfPass = String
+						.valueOf(EAOManager.INSTANCE
+								.getTestResultEAO()
+								.doSimpleQuery(
+										TestResultFilterHelper
+												.buildHQL4CountPassTestResultsOfTestUnit(
+														filter, testUnitId))
+								.get(0));
 				agentCell.setNoOfAll(noOfAll);
 				agentCell.setNoOfPass(noOfPass);
 				row.add(agentCell);
@@ -383,64 +388,50 @@ public enum TestResultsService {
 	}
 
 	public boolean importAllTestResults(String indexFilePath)
-			throws ASBPersistenceException {
-		try {
-			File indexF = new File(indexFilePath);
-			ExportTestResultsFile indexFile = new ExportTestResultsFile();
-			indexFile = (ExportTestResultsFile) JAXBUtils.fileToObject(indexF,
-					ExportTestResultsFile.class);
-			if (indexFile == null) {
-				logger.error("Cannot load index file for importing");
-				return false;
-			}
-			for (TestResultsBunch bunch : indexFile.getTestResultsBunch()) {
-				String userId = bunch.getUser().getUserId();
-				TestResultsBunch b = new TestResultsBunch();
-				User user = EAOManager.INSTANCE.getUserEAO().findByUserId(
-						userId);
-				if (user == null) {
-					logger.warn("User not found: " + userId);
-					user = EAOManager.INSTANCE.getUserEAO()
-							.findByUserId("anon");
-					logger.warn("Anon user used");
-				}
-				b.setUser(user);
-				b.setDate(bunch.getDate());
-				b.setOptionalName(bunch.getOptionalName());
-				if (b.getOptionalName() == null) {
-					b.setOptionalName("imported");
-				}
-				List<TestResult> rs = new ArrayList<TestResult>();
-				for (TestResult res : bunch.getResults()) {
-					TestResult r = new TestResult();
-					TestUnitDescription tu = EAOManager.INSTANCE
-							.getTestUnitDescriptionEAO().findByTestUnitId(
-									res.getTestUnitDescription()
-											.getTestUnitId());
-					if (tu == null) {
-						logger.warn("Test not found in db: "
-								+ tu.getTestUnitId());
-						continue;
-					}
-					r.setTestUnitDescription(tu);
-					r.setComment(res.getComment());
-					r.setResultValue(res.isResultValue());
-					r.setRunDate(res.getRunDate());
-					r.setTestingProfile(res.getTestingProfile());
-					logger.info("Addition result for test: "
-							+ r.getTestUnitDescription().getTestUnitId());
-					rs.add(r);
-				}
-				logger.info("Saving...");
-				this.saveResultsBunch(b);
-				logger.info("Saved successfully...");
-			}
-			return true;
-		} catch (Exception e) {
-			logger.error("Unexpect import error: " + e.getLocalizedMessage());
-			logger.debug("Unexpect import error: ", e.getStackTrace());
+			throws ASBPersistenceException, JAXBException {
+		File indexF = new File(indexFilePath);
+		ExportTestResultsFile indexFile = new ExportTestResultsFile();
+		indexFile = (ExportTestResultsFile) JAXBUtils.fileToObject(indexF,
+				ExportTestResultsFile.class);
+		if (indexFile == null) {
+			logger.error("Cannot load index file for importing");
 			return false;
 		}
+		logger.info("xml loaded");
+		for (SimpleTestResultsBunch bunch : indexFile.getTestResultsBunch()) {
+			String userId = bunch.getUserId();
+			TestResultsBunch b = new TestResultsBunch();
+			User user = EAOManager.INSTANCE.getUserEAO().findByUserId(userId);
+			if (user == null) {
+				logger.warn("User not found: " + userId);
+				user = EAOManager.INSTANCE.getUserEAO().findByUserId("anon");
+				logger.warn("Anon user used");
+			}
+			logger.info("user : " + user.getUserId());
+			b.setUser(user);
+			b.setDate(bunch.getDate());
+			b.setOptionalName(bunch.getOptionalName());
+			if (b.getOptionalName() == null) {
+				b.setOptionalName("imported");
+			}
+			List<TestResult> rs = new ArrayList<TestResult>();
+			for (SimpleTestResult res : bunch.getResults()) {
+				TestResult r = TestUnitHelper.adaptSimple2TestResult(res);
+				if (r.getTestUnitDescription() == null) {
+					logger.warn("Test not found in db: " + res.getTestUnitId());
+					continue;
+				}
+				logger.info("Addition result for test: "
+						+ r.getTestUnitDescription().getTestUnitId());
+				rs.add(r);
+			}
+			b.setResults(rs);
+			logger.info("Saving...");
+			this.saveResultsBunch(b);
+			logger.info("Saved successfully...");
+		}
+		return true;
+
 	}
 
 	public void exportAllTestResults() {
@@ -464,14 +455,10 @@ public enum TestResultsService {
 		List<TestResultsBunch> bunches = EAOManager.INSTANCE
 				.getTestResultsBunchEAO().findAll();
 		logger.info("no of bunchs " + bunches.size());
-		for (Iterator<TestResultsBunch> iterator = bunches.iterator(); iterator
-				.hasNext();) {
-			TestResultsBunch testResultsBunch = (TestResultsBunch) iterator
-					.next();
-			List<TestResult> r = testResultsBunch.getResults();
-			logger.debug("Results for " + testResultsBunch.getId() + " "
-					+ r.size());
-			indexFile.getTestResultsBunch().add(testResultsBunch);
+		for (TestResultsBunch testResultsBunch : bunches) {
+			SimpleTestResultsBunch b = new SimpleTestResultsBunch(
+					testResultsBunch);
+			indexFile.getTestResultsBunch().add(b);
 		}
 		try {
 			JAXBUtils.objectToXmlFile(targetExportPath + "/testresults.xml",
@@ -486,5 +473,4 @@ public enum TestResultsService {
 			logger.debug("JAXBException error stack: ", e);
 		}
 	}
-
 }

@@ -2,7 +2,9 @@ package org.w3c.wai.accessdb.helpers;
 
 import java.io.File;
 
-import org.w3c.wai.accessdb.om.Technique;
+import org.w3c.wai.accessdb.eao.EAOManager;
+import org.w3c.wai.accessdb.jaxb.SimpleTestResult;
+import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.om.testunit.RefFileType;
 import org.w3c.wai.accessdb.om.testunit.Step;
 import org.w3c.wai.accessdb.om.testunit.TestProcedure;
@@ -14,10 +16,12 @@ public class TestUnitHelper {
 
 	public static TestUnitDescription generateTestUnitDescriptionId(
 			TestUnitDescription testUnitDescription) {
-		String keySize=ConfigService.INSTANCE
+		String keySize = ConfigService.INSTANCE
 				.getConfigParam(ConfigService.KEY_GENERATOR_SIZE);
-		String id = testUnitDescription.getTechnique().getNameId() + "_"
-				+ String.format("%0"+ keySize + "d", testUnitDescription.getId());
+		String id = testUnitDescription.getTechnique().getNameId()
+				+ "_"
+				+ String.format("%0" + keySize + "d",
+						testUnitDescription.getId());
 		testUnitDescription.setTestUnitId(id);
 		return testUnitDescription;
 	}
@@ -29,17 +33,18 @@ public class TestUnitHelper {
 
 	public static String getTestUnitFolderPath(
 			TestUnitDescription testUnitDescription) {
-		String webTechnologyPath = testUnitDescription.getTechnique().getWebTechnology().getNameId();
+		String webTechnologyPath = testUnitDescription.getTechnique()
+				.getWebTechnology().getNameId();
 		String folderPref = ConfigService.INSTANCE
 				.getConfigParam(ConfigService.FORM_TESTUNIT_FOLDER);
 		String folderName = testUnitDescription.getTestUnitId();
 		String path = folderPref + webTechnologyPath + "/" + folderName + "/";
 		return path;
 	}
-	
 
-	public static TestUnitDescription cloneTest(TestUnitDescription tu){
-		TestUnitDescription test = (TestUnitDescription) InOutUtils.deepClone(tu);
+	public static TestUnitDescription cloneTest(TestUnitDescription tu) {
+		TestUnitDescription test = (TestUnitDescription) InOutUtils
+				.deepClone(tu);
 		test.setId(-1);
 		TestProcedure tp = test.getTestProcedure();
 		for (Step step : tp.getStep()) {
@@ -51,5 +56,40 @@ public class TestUnitHelper {
 		}
 		return test;
 	}
+
+	public static TestResult cloneTestResult(TestResult r) {
+		TestResult res = new TestResult();
+		res.setComment(r.getComment());
+		res.setResultValue(r.isResultValue());
+		res.setRunDate(r.getRunDate());
+		res.setTestingProfile(r.getTestingProfile());
+		res.setId(-1);
+		if (res.getTestingProfile().getAssistiveTechnology() != null)
+			res.getTestingProfile().getAssistiveTechnology().setId(-1);
+		if (res.getTestingProfile().getPlatform() != null)
+			res.getTestingProfile().getPlatform().setId(-1);
+		if (res.getTestingProfile().getPlugin() != null)
+			res.getTestingProfile().getPlugin().setId(-1);
+		if (res.getTestingProfile().getUserAgent() != null)
+			res.getTestingProfile().getUserAgent().setId(-1);
+		return res;
+	}
+	public static TestResult adaptSimple2TestResult(SimpleTestResult sr){
+    	TestResult r = new TestResult();
+		r.setTestingProfile(sr.getTestingProfile());
+		if (r.getTestingProfile().getAssistiveTechnology() != null)
+			r.getTestingProfile().getAssistiveTechnology().setId(-1);
+		if (r.getTestingProfile().getPlatform() != null)
+			r.getTestingProfile().getPlatform().setId(-1);
+		if (r.getTestingProfile().getPlugin() != null)
+			r.getTestingProfile().getPlugin().setId(-1);
+		if (r.getTestingProfile().getUserAgent() != null)
+			r.getTestingProfile().getUserAgent().setId(-1);
+		r.setComment(sr.getComment());
+		r.setResultValue(sr.isResultValue());
+		r.setRunDate(sr.getRunDate());
+		r.setTestUnitDescription(EAOManager.INSTANCE.getTestUnitDescriptionEAO().findByTestUnitId(sr.getTestUnitId()));
+    	return r;
+    }
 
 }

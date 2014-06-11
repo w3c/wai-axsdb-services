@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.bind.JAXBException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -97,10 +98,13 @@ public class AdminResource {
 			TestResultsService.INSTANCE.importAllTestResults(path);
 			logger.info("done");
 			return Response.ok().build();
-		}
-		catch(Exception e){
+		}catch(ASBPersistenceException e){
 			logger.error(e.getLocalizedMessage());
-			return Response.noContent().entity(e).build();
+			return Response.serverError().entity(e.getLocalizedMessage()).build();
+			
+		} catch (JAXBException e) {
+			logger.error(e.getLocalizedMessage());
+			return Response.serverError().entity(e.getLocalizedMessage()).build();
 		}
 	}	
 	

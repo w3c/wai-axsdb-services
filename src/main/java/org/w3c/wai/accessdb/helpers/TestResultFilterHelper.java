@@ -35,7 +35,25 @@ public class TestResultFilterHelper {
 					+ ua.getVersion() + "'");
 		return sql.toString();
 	}
-
+	public static String buildHQL4TestResultView(
+			TestResultFilter filter) {
+		StringBuffer sql = new StringBuffer();
+		SimpleProduct at = filter.getAts().get(0);
+		SimpleProduct ua = filter.getUas().get(0);
+		sql.append("select DISTINCT r, b.optionalName, b.user.userId, b.date from TestResult as r, TestResultsBunch as b where ");
+		sql.append(" r in elements(b.results) ");
+		sql.append(" and r.testingProfile.assistiveTechnology.name='"
+				+ at.getName() + "'");
+		if (at.getVersion() != null && at.getVersion().length() > 0)
+			sql.append(" and r.testingProfile.assistiveTechnology.version.text='"
+					+ at.getVersion() + "'");
+		sql.append(" and r.testingProfile.userAgent.name='" + ua.getName()
+				+ "'");
+		if (ua.getVersion() != null && ua.getVersion().length() > 0)
+			sql.append(" and r.testingProfile.userAgent.version.text='"
+					+ ua.getVersion() + "'");
+		return sql.toString();
+	}
 	public static String buildHQL4TestResultFullViewTechnique(
 			TestResultFilter filter, String techId) {
 		StringBuffer sql = new StringBuffer();

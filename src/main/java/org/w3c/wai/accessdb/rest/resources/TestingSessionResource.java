@@ -74,6 +74,8 @@ public class TestingSessionResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Consumes({ MediaType.APPLICATION_JSON })
 	public Response login(LoginData  data) {
+		if(!data.isValid())
+			return Response.status(Status.NOT_ACCEPTABLE).entity(data).build();
 		TestingSession s = null;
 		try {
 			s = TestingSessionService.INSTANCE.login(data);

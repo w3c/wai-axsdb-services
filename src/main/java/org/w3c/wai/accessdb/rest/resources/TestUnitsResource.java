@@ -198,11 +198,10 @@ public class TestUnitsResource {
 	}
 
 	@DELETE
-	@Path("resource/{sessionId}/{testUnitId}/{fileId}")
+	@Path("resource/{sessionId}/{fileId}")
 	public Response deleteResourceFile(
 			@PathParam("sessionId") String sessionId,
-			@PathParam("fileId") String fileId,
-			@PathParam("testUnitId") String testUnitId) {
+			@PathParam("fileId") String fileId) {
 		try {
 			if (!TestingSessionService.INSTANCE
 					.isAuthenticatedAsExpert(sessionId)) {
@@ -214,10 +213,11 @@ public class TestUnitsResource {
 		}
 		logger.info("OK you have permission for deleting resource file.");
 		try {
-			TestUnitDescription testUnitDescription = EAOManager.INSTANCE
-					.getTestUnitDescriptionEAO().findByTestUnitId(testUnitId);
 			RefFileType refFile = EAOManager.INSTANCE.getRefFileTypeEAO()
 					.findById(Long.parseLong(fileId));
+			TestUnitDescription testUnitDescription = EAOManager.INSTANCE
+					.getTestUnitDescriptionEAO().findByRefFile(refFile);
+
 			String folderPath = TestUnitHelper
 					.getTestUnitFolderPath(testUnitDescription);
 			File file = new File(folderPath + "/" + refFile.getSrc());
@@ -236,11 +236,11 @@ public class TestUnitsResource {
 			else
 				logger.warn(file.getName() + " cannot be deleted");
 			EAOManager.INSTANCE.getRefFileTypeEAO().delete(refFile);
+			return Response.ok(testUnitDescription).build();
 		} catch (Exception e) {
 			logger.warn(e.getLocalizedMessage());
 			return Response.notModified(e.getLocalizedMessage()).build();
 		}
-		return Response.ok().build();
 	}
 /**
  * Saves a test posted by a form. 

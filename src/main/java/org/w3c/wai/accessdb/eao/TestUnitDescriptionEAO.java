@@ -2,6 +2,7 @@ package org.w3c.wai.accessdb.eao;
 
 import java.util.List;
 
+import org.w3c.wai.accessdb.om.testunit.RefFileType;
 import org.w3c.wai.accessdb.om.testunit.TestUnitDescription;
 
 /**
@@ -14,6 +15,14 @@ public class TestUnitDescriptionEAO extends BaseEAO<TestUnitDescription> {
 	public TestUnitDescription findByTestUnitId(String id) {
 		List<TestUnitDescription> l = this.findByNamedQuery(
 				"TestUnitDescription.findbyUnitId", id);
+		if (l != null && l.size() > 0)
+			return (TestUnitDescription) l.get(0);
+		else
+			return null;
+	}
+	public TestUnitDescription findByRefFile(RefFileType refFile) {
+		List<TestUnitDescription> l = this.findByNamedQuery(
+				"TestUnitDescription.findByRefFile", refFile);
 		if (l != null && l.size() > 0)
 			return (TestUnitDescription) l.get(0);
 		else

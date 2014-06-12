@@ -12,6 +12,7 @@ import org.w3c.wai.accessdb.jaxb.TestResultFilter;
 public class TestResultFilterHelper {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestResultFilterHelper.class);
+
 	public static String buildHQL4TestResultViewTechnique(
 			TestResultFilter filter, String techId) {
 		if (filter.getAts().size() != 1 || filter.getUas().size() != 1)
@@ -35,8 +36,8 @@ public class TestResultFilterHelper {
 					+ ua.getVersion() + "'");
 		return sql.toString();
 	}
-	public static String buildHQL4TestResultView(
-			TestResultFilter filter) {
+
+	public static String buildHQL4TestResultView(TestResultFilter filter) {
 		StringBuffer sql = new StringBuffer();
 		SimpleProduct at = filter.getAts().get(0);
 		SimpleProduct ua = filter.getUas().get(0);
@@ -54,6 +55,7 @@ public class TestResultFilterHelper {
 					+ ua.getVersion() + "'");
 		return sql.toString();
 	}
+
 	public static String buildHQL4TestResultFullViewTechnique(
 			TestResultFilter filter, String techId) {
 		StringBuffer sql = new StringBuffer();
@@ -162,14 +164,25 @@ public class TestResultFilterHelper {
 				+ TestResultFilterHelper.buildHQL4TestResults(filter) + ")");
 		return sql.toString();
 	}
-
+	
 	public static String buildHQL4TestResults(TestResultFilter filter) {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select DISTINCT r from TestResult as r ");
 		if (filter.getAts().size() > 0 || filter.getOss().size() > 0
 				|| filter.getUas().size() > 0)
 			sql.append(" where ");
-		sql.append(filterSubQuery(filter));
+		sql.append(filterSubQuery(filter, false));
+		logger.debug(sql.toString());
+		return sql.toString();
+	}
+
+
+	public static String buildHQL4SimpleTestResults(TestResultFilter filter) {
+		StringBuffer sql = new StringBuffer();
+		sql.append("select DISTINCT r.testingProfile as testingProfile, r.testUnitDescription.testUnitId as testUnitId, "
+				+ "r.resultValue as resultValue, r.comment as comment, r.runDate as runDate, b.user.userId as userId "
+				+ "from TestResult as r, TestResultsBunch b where r in elements(b.results) ");
+		sql.append(filterSubQuery(filter, true));
 		logger.debug(sql.toString());
 		return sql.toString();
 	}
@@ -209,7 +222,7 @@ public class TestResultFilterHelper {
 	}
 
 	public static String buildHQL4UA(TestResultFilter filter) {
-		StringBuffer sql = new StringBuffer();
+		StringBuffer sql = new StringBuffer(); 
 		boolean where = false;
 		sql.append("select DISTINCT r.testingProfile.userAgent.name as name, "
 				+ "r.testingProfile.userAgent.version.text as version from TestResult as r ");
@@ -272,7 +285,7 @@ public class TestResultFilterHelper {
 		return sql.toString();
 	}
 
-	private static String filterSubQuery(TestResultFilter filter) {
+	private static String filterSubQuery(TestResultFilter filter, boolean startAnd) {
 		List<String> stmnts = new ArrayList<String>();
 		if (filter.getAts().size() > 0)
 			stmnts.add(getTestingProfileSubQuery(filter.getAts(),
@@ -290,7 +303,9 @@ public class TestResultFilterHelper {
 			stmnts.add(sqlIN("r.testUnitDescription.technique",
 					filter.getTechniques()));
 		StringBuffer sql = new StringBuffer();
-		String[] array =  stmnts.toArray(new String[0]);
+		String[] array = stmnts.toArray(new String[0]);
+		if(startAnd && array.length>0)
+			sql.append(" AND ");
 		for (int i = 0; i < array.length; i++) {
 			String s = array[i];
 			sql.append(s);

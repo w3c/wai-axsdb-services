@@ -14,6 +14,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.jaxb.ElementWrapper;
+import org.w3c.wai.accessdb.jaxb.SimpleTestResult;
 import org.w3c.wai.accessdb.jaxb.TestResultDataOverview;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
 import org.w3c.wai.accessdb.jaxb.TestResultTestOveview;
@@ -134,8 +135,13 @@ public class TestResultsResource {
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response findByFilter(TestResultFilter filter) {
-		List<TestResult> results = TestResultsService.INSTANCE.getResults(filter);
-		return Response.status(Status.OK).entity(results).build();
+		List<SimpleTestResult> results;
+		try {
+			results = TestResultsService.INSTANCE.getResults(filter);
+			return Response.status(Status.OK).entity(results).build();
+		} catch (ASBPersistenceException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getStackTrace()).build();
+		}
 	}
 	/**
 	 * Find test results based on filter
@@ -146,8 +152,13 @@ public class TestResultsResource {
 	@POST
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response findByTestAndFilter(TestResultFilter filter,@PathParam("testUnitId") String testUnitId) {
-		List<TestResult> results = TestResultsService.INSTANCE.getResults(filter);
-		return Response.status(Status.OK).entity(results).build();
+		List<SimpleTestResult> results;
+		try {
+			results = TestResultsService.INSTANCE.getResults(filter);
+			return Response.status(Status.OK).entity(results).build();
+		} catch (ASBPersistenceException e) {
+			return Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getStackTrace()).build();
+		}
 	}
 	/**
 	 * Top level results view: by technique overall pass and fail 

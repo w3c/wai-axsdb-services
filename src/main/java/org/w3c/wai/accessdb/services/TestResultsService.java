@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -31,6 +32,7 @@ import org.w3c.wai.accessdb.jaxb.TestResultViewTableCell;
 import org.w3c.wai.accessdb.om.Technique;
 import org.w3c.wai.accessdb.om.TestResult;
 import org.w3c.wai.accessdb.om.TestResultsBunch;
+import org.w3c.wai.accessdb.om.TestingProfile;
 import org.w3c.wai.accessdb.om.User;
 import org.w3c.wai.accessdb.om.product.AssistiveTechnology;
 import org.w3c.wai.accessdb.om.product.UAgent;
@@ -326,14 +328,30 @@ public enum TestResultsService {
 		return resultsData;
 	}
 
-	public List<TestResult> getResults(TestResultFilter filter) {
-		List<TestResult> results = new ArrayList<TestResult>();
+	public List<SimpleTestResult> getResults(TestResultFilter filter) throws ASBPersistenceException {
+		List<SimpleTestResult> results = new ArrayList<SimpleTestResult>();
 		try {
-			String q = TestResultFilterHelper.buildHQL4TestResults(filter);
+			String q = TestResultFilterHelper.buildHQL4SimpleTestResults(filter);
 			logger.info("getResultsNode Query: " + q);
-			results = EAOManager.INSTANCE.getTestResultEAO().doSimpleQuery(q);
+			List<Object[]> resultList = EAOManager.INSTANCE.getTestResultEAO()
+	                .doSimpleQuery(q);
+			for (Object[] result : resultList)
+	        {
+				SimpleTestResult r = new SimpleTestResult();
+				r.setTestingProfile((TestingProfile)result[0]);
+				r.setTestUnitId((String)result[1]);
+				r.setResultValue((boolean) result[2]);
+				r.setComment((String)result[3]);
+				r.setRunDate((Date)result[4]);
+				r.setUserId((String)result[5]);
+	            results.add(r);
+	        }
+			
 		} catch (Exception e) {
 			logger.debug(e.getLocalizedMessage());
+			logger.info("getResults: " + e.getMessage());
+			throw new ASBPersistenceException(e);
+
 		}
 		logger.info("getResultsNode combinations from database: "
 				+ results.size());

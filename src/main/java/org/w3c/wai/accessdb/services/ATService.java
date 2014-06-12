@@ -39,8 +39,6 @@ public enum ATService
         List<Object[]> resultList = EAOManager.INSTANCE.getTestResultEAO()
                 .doSimpleQuery(q);
         List<SimpleProduct> products = new ArrayList<SimpleProduct>();
-        Map<String, String> resultMap = new HashMap<String, String>(
-                resultList.size());
         for (Object[] result : resultList)
         {
             SimpleProduct p = new SimpleProduct();

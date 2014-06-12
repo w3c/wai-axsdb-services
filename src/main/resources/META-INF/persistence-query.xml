@@ -37,6 +37,9 @@
 	<named-query name="TestUnitDescription.findbyUnitId">
 		<query>from TestUnitDescription where testUnitId = ?</query>
 	</named-query>
+	<named-query name="TestUnitDescription.findByRefFile">
+		<query>from TestUnitDescription as tu where ? in elements(tu.subject.resourceFiles)</query>
+	</named-query>
 	
 	<named-query name="TestUnitDescription.findbyTechnique">
 		<query>from TestUnitDescription where technique.nameId = ?</query>

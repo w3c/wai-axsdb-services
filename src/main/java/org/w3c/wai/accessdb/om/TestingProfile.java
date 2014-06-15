@@ -1,5 +1,7 @@
 package org.w3c.wai.accessdb.om;
 
+import java.io.Serializable;
+
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.ManyToOne;
@@ -17,7 +19,7 @@ import org.w3c.wai.accessdb.om.product.UAgent;
 
 @XmlRootElement
 @Embeddable
-public class TestingProfile  implements Comparable<TestingProfile> {
+public class TestingProfile  implements Comparable<TestingProfile>, Serializable {
 	
 	private String profileComment;
 	@ManyToOne(cascade=CascadeType.ALL)

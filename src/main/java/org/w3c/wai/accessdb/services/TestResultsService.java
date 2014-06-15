@@ -172,7 +172,6 @@ public enum TestResultsService {
 
 	public TestResultViewTable loadTestResultViewTest(TestResultFilter filter,
 			String testUnitId) {
-		// find unique combinations based on filter and technique
 		TestResultViewTable view = new TestResultViewTable();
 		view.setId(testUnitId);
 		List<Object[]> atCombinations = null;

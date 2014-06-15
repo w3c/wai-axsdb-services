@@ -1,11 +1,13 @@
 package org.w3c.wai.accessdb.om;
 
+import java.io.Serializable;
+
 import javax.persistence.Embeddable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 @Embeddable
-public class ProductVersion implements Comparable<ProductVersion>{
+public class ProductVersion implements Comparable<ProductVersion>, Serializable{
 	private int major;
 	private int minor;
 	private int revision;

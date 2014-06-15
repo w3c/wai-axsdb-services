@@ -91,7 +91,7 @@ public class TestResultFilterHelper {
 	public static String buildHQL4TestResultViewTest(TestResultFilter filter,
 			String testUnitId) {
 		StringBuffer sql = new StringBuffer();
-		// get all AT combinations for filter/technique
+		// get all AT combinations for filter/testiid
 		sql.append("select DISTINCT res.testingProfile.assistiveTechnology.name as atName, "
 				+ "res.testingProfile.assistiveTechnology.version.text as atVersion, "
 				+ "res.testingProfile.userAgent.name as uaName, "
@@ -101,22 +101,7 @@ public class TestResultFilterHelper {
 				+ "where "
 				+ " res.testUnitDescription.testUnitId = '"
 				+ testUnitId + "'");
-		// filter
-		if (filter.getAts().size() > 0) {
-			sql.append(" AND ");
-			sql.append(getTestingProfileSubQuery(filter.getAts(),
-					"assistiveTechnology", "res"));
-		}
-		if (filter.getUas().size() > 0) {
-			sql.append(" AND ");
-			sql.append(getTestingProfileSubQuery(filter.getUas(), "userAgent",
-					"res"));
-		}
-		if (filter.getOss().size() > 0) {
-			sql.append(" AND ");
-			sql.append(getTestingProfileSubQuery(filter.getOss(), "platform",
-					"res"));
-		}
+		sql.append(TestResultFilterHelper.filterSubQuery(filter, "res", true));
 		return sql.toString();
 	}
 
@@ -171,7 +156,7 @@ public class TestResultFilterHelper {
 		if (filter.getAts().size() > 0 || filter.getOss().size() > 0
 				|| filter.getUas().size() > 0)
 			sql.append(" where ");
-		sql.append(filterSubQuery(filter, false));
+		sql.append(filterSubQuery(filter, "r", false));
 		logger.debug(sql.toString());
 		return sql.toString();
 	}
@@ -182,7 +167,7 @@ public class TestResultFilterHelper {
 		sql.append("select DISTINCT r.testingProfile as testingProfile, r.testUnitDescription.testUnitId as testUnitId, "
 				+ "r.resultValue as resultValue, r.comment as comment, r.runDate as runDate, b.user.userId as userId "
 				+ "from TestResult as r, TestResultsBunch b where r in elements(b.results) ");
-		sql.append(filterSubQuery(filter, true));
+		sql.append(filterSubQuery(filter, "r", true));
 		logger.debug(sql.toString());
 		return sql.toString();
 	}
@@ -285,22 +270,22 @@ public class TestResultFilterHelper {
 		return sql.toString();
 	}
 
-	private static String filterSubQuery(TestResultFilter filter, boolean startAnd) {
+	private static String filterSubQuery(TestResultFilter filter, String prefix, boolean startAnd) {
 		List<String> stmnts = new ArrayList<String>();
 		if (filter.getAts().size() > 0)
 			stmnts.add(getTestingProfileSubQuery(filter.getAts(),
-					"assistiveTechnology", "r"));
+					"assistiveTechnology", prefix));
 		if (filter.getUas().size() > 0)
 			stmnts.add(getTestingProfileSubQuery(filter.getUas(), "userAgent",
-					"r"));
+					prefix));
 		if (filter.getOss().size() > 0)
 			stmnts.add(getTestingProfileSubQuery(filter.getOss(), "platform",
-					"r"));
+					prefix));
 		if (filter.getTests().size() > 0)
-			stmnts.add(sqlIN("r.testUnitDescription.testUnitId",
+			stmnts.add(sqlIN(prefix+ ".testUnitDescription.testUnitId",
 					filter.getTests()));
 		if (filter.getTechniques().size() > 0)
-			stmnts.add(sqlIN("r.testUnitDescription.technique",
+			stmnts.add(sqlIN(prefix + ".testUnitDescription.technique.nameId",
 					filter.getTechniques()));
 		StringBuffer sql = new StringBuffer();
 		String[] array = stmnts.toArray(new String[0]);

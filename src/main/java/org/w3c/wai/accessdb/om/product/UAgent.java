@@ -19,7 +19,10 @@ public class UAgent extends Product<UAgent>
     {
 
     }
-
+    public UAgent(Product p)
+    {
+        super(p.getName(), p.getVersion().getText());
+    }
     public UAgent(String name, String ver)
     {
         super(name, ver);

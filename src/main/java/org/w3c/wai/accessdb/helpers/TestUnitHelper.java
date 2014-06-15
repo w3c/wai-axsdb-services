@@ -1,6 +1,7 @@
 package org.w3c.wai.accessdb.helpers;
 
 import java.io.File;
+import java.io.IOException;
 
 import org.w3c.wai.accessdb.eao.EAOManager;
 import org.w3c.wai.accessdb.jaxb.SimpleTestResult;
@@ -42,7 +43,7 @@ public class TestUnitHelper {
 		return path;
 	}
 
-	public static TestUnitDescription cloneTest(TestUnitDescription tu) {
+	public static TestUnitDescription cloneTest(TestUnitDescription tu) throws ClassNotFoundException, IOException {
 		TestUnitDescription test = (TestUnitDescription) InOutUtils
 				.deepClone(tu);
 		test.setId(-1);

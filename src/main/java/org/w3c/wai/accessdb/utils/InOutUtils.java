@@ -25,20 +25,17 @@ import javax.ws.rs.core.MultivaluedMap;
 public class InOutUtils {
 	/**
 	 * This method makes a "deep clone" of any Java object it is given.
+	 * @throws IOException 
+	 * @throws ClassNotFoundException 
 	 */
-	 public static Object deepClone(Object object) {
-	   try {
+	 public static Object deepClone(Object object) throws IOException, ClassNotFoundException {
 	     ByteArrayOutputStream baos = new ByteArrayOutputStream();
 	     ObjectOutputStream oos = new ObjectOutputStream(baos);
 	     oos.writeObject(object);
 	     ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
 	     ObjectInputStream ois = new ObjectInputStream(bais);
 	     return ois.readObject();
-	   }
-	   catch (Exception e) {
-	     e.printStackTrace();
-	     return null;
-	   }
+	   
 	 }
 	/**
 	 * header sample { Content-Type=[image/png], Content-Disposition=[form-data;

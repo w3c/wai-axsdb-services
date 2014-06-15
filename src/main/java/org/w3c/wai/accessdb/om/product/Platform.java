@@ -15,6 +15,10 @@ public class Platform extends Product<Platform> {
 	public Platform() {
 		super();
 	}
+
+	public Platform(Product p) {
+		super(p.getName(), p.getVersion().getText());
+	}
 	public Platform(String name, String ver, String arc) {
 		super(name, ver);
 		this.setArchitecture(arc);

@@ -19,6 +19,10 @@ public class AssistiveTechnology extends Product<AssistiveTechnology>
     {
         super(name, ver);
     }
+    public AssistiveTechnology(Product p)
+    {
+        super(p.getName(), p.getVersion().getText());
+    }
 
     public AssistiveTechnology()
     {

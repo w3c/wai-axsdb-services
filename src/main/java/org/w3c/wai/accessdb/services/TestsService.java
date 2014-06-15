@@ -162,6 +162,7 @@ public enum TestsService {
 		testUnitDescription = eao.persist(testUnitDescription);
 		testUnitDescription = TestUnitHelper
 				.generateTestUnitDescriptionId(testUnitDescription);
+		testUnitDescription = eao.persist(testUnitDescription);
 		return testUnitDescription;
 	}
 
@@ -273,7 +274,7 @@ public enum TestsService {
 	}
 
 	public boolean importTests(String indexFilePath)
-			throws ASBPersistenceException, JAXBException {
+			throws ASBPersistenceException, JAXBException, ClassNotFoundException {
 		File indexF = new File(indexFilePath);
 		ExportTestFile indexFile = new ExportTestFile();
 		indexFile = (ExportTestFile) JAXBUtils.fileToObject(indexF,

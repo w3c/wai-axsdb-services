@@ -168,4 +168,22 @@ public class GitHubTechniquesSpecParser {
 		}
 		return results;
 	}	
+	
+	public static List<ImportResponse<Technique>> importTechniques(String url) throws IOException {
+		ImportResponse<List<GitHubTechniqueInfo>> allInGit = GitHubTechniquesSpecParser.prepareImport(url);
+		System.out.println("all : " + allInGit.getEntity().size());
+		List<ImportResponse<GitHubTechniqueInfo>> filtered = GitHubTechniquesSpecParser.filterTechniques(allInGit);
+		System.out.println("filtered : " + filtered.size());
+		//  sent to the user
+		
+		// the user makes selections
+
+		for (ImportResponse<GitHubTechniqueInfo> ir : filtered) {
+			System.out.println("tech info found : " + ir);
+		}
+		List<ImportResponse<Technique>> rs = GitHubTechniquesSpecParser.importTechniques(filtered);
+		logger.info(rs.size()+" done");
+		return rs;
+	}	
+	
 }

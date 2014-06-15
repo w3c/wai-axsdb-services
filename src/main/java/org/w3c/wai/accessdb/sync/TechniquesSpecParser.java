@@ -32,7 +32,7 @@ import org.xml.sax.SAXException;
 public class TechniquesSpecParser {
 	private static final Logger LOG = LoggerFactory
 			.getLogger(TechniquesSpecParser.class);
-
+@Deprecated
 	public static List<Technique> parse(String url) throws XPathExpressionException, ParserConfigurationException, ASBPersistenceException, IOException, SAXException {
 		List<Technique> newTechniques = new ArrayList<Technique>();
 		InputSource isTech = new InputSource(url);
@@ -44,6 +44,7 @@ public class TechniquesSpecParser {
 		xtechniques = xpath.compile("//body/div1/technique");
 		DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
 		factory.setValidating(false);
+		factory.setXIncludeAware(true);
 		factory.setFeature(
 				"http://apache.org/xml/features/disallow-doctype-decl",
 				false); // ignore dtd
@@ -123,6 +124,7 @@ public class TechniquesSpecParser {
 				}
 				newTechniques.add(technique);
 			}
+			LOG.info("imported " + newTechniques.size() + " from " + url);
 
 		}
 		return newTechniques;

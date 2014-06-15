@@ -3,10 +3,8 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
 	<display-name>Access DB Services Application</display-name>
 
-<!-- 	<context-param>
-		<param-name>resteasy.scan</param-name>
-		<param-value>true</param-value>
-	</context-param> -->
+	<!-- <context-param> <param-name>resteasy.scan</param-name> <param-value>true</param-value> 
+		</context-param> -->
 	<context-param>
 		<param-name>resteasy.providers</param-name>
 		<param-value>org.w3c.wai.accessdb.utils.JacksonConfigurator</param-value>
@@ -19,25 +17,25 @@
 
 	<listener>
 		<listener-class>
-			org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap
-		</listener-class>
+			org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
 	</listener>
 
 	<servlet>
 		<servlet-name>resteasy-servlet</servlet-name>
 		<servlet-class>
-			org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher
-		</servlet-class>
+			org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
 		<init-param>
 			<param-name>javax.ws.rs.Application</param-name>
 			<param-value>org.w3c.wai.accessdb.rest.app.EAccessDBApp</param-value>
 		</init-param>
 	</servlet>
+	<!-- <servlet> <servlet-name>RESTEasy JSAPI</servlet-name> <servlet-class>org.jboss.resteasy.jsapi.JSAPIServlet</servlet-class> 
+		</servlet> -->
 	<servlet>
-		<servlet-name>RESTEasy JSAPI</servlet-name>
-		<servlet-class>org.jboss.resteasy.jsapi.JSAPIServlet</servlet-class>
+		<servlet-name>init actions</servlet-name>
+		<servlet-class>org.w3c.wai.accessdb.helpers.InitServlet</servlet-class>
+		<load-on-startup>1</load-on-startup>
 	</servlet>
-
 	<servlet>
 		<servlet-name>ConfigServlet</servlet-name>
 		<servlet-class>org.w3c.wai.accessdb.helpers.ConfigServlet</servlet-class>
@@ -52,8 +50,6 @@
 		<servlet-name>resteasy-servlet</servlet-name>
 		<url-pattern>/rest/*</url-pattern>
 	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>RESTEasy JSAPI</servlet-name>
-		<url-pattern>/rest-js</url-pattern>
-	</servlet-mapping>
+	<!-- <servlet-mapping> <servlet-name>RESTEasy JSAPI</servlet-name> <url-pattern>/rest-js</url-pattern> 
+		</servlet-mapping> -->
 </web-app>

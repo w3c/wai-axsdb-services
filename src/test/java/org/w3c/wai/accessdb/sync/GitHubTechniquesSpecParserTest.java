@@ -17,7 +17,7 @@ import org.xml.sax.SAXException;
 
 public class GitHubTechniquesSpecParserTest {
 
-	@Test
+	@Test 
 	public void test() throws XPathExpressionException, ParserConfigurationException, ASBPersistenceException, IOException, SAXException {
 		String url = "https://raw.github.com/w3c/wcag/Working-Branch-for-Fall-2014/wcag20/sources/techniques/aria.xml";
 		ImportResponse<List<GitHubTechniqueInfo>> allInGit = GitHubTechniquesSpecParser.prepareImport(url);
@@ -31,9 +31,9 @@ public class GitHubTechniquesSpecParserTest {
 		for (ImportResponse<GitHubTechniqueInfo> ir : filtered) {
 			System.out.println("tech info found : " + ir);
 		}
-		//List<ImportResponse<Technique>> rs = GitHubTechniquesSpecParser.importTechniques(filtered);
-		//System.out.println(rs);
-		//Assert.assertEquals(rs.size()>0, true);
+		List<ImportResponse<Technique>> rs = GitHubTechniquesSpecParser.importTechniques(filtered);
+		System.out.println(rs);
+		Assert.assertEquals(rs.size()>0, true);
 	}
 
 }

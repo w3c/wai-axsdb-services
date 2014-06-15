@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<TestUnitDescription testUnitId="ARIA4_0000003" language="en">
+    <id>3</id>
+    <title>new 444</title>
+    <description>sdfsdfsdf </description>
+    <status>unconfirmed</status>
+    <creator>evlachog</creator>
+    <version>0.1</version>
+    <date>2014-06-02 11:57:13</date>
+    <technique>
+        <id>3</id>
+        <nameId>ARIA4</nameId>
+        <specRef>https://raw.github.com/w3c/wcag/Working-Branch-for-Fall-2014/wcag20/sources/techniques/aria/ARIA4.xml</specRef>
+        <title>Using a WAI-ARIA role to expose the role of a user interface component</title>
+        <webTechnology>WCAG20-ARIA-TECHS</webTechnology>
+        <status>1</status>
+        <lastModified>2014-03-28T17:18:24Z</lastModified>
+        <sha>90d1c1c3fdf2a793a0c93cc5408c53b913ddd1a7</sha>
+    </technique>
+    <subject>
+        <testFile src="ARIA4_0000003.html">
+            <id>8</id>
+        </testFile>
+        <resources/>
+    </subject>
+    <testProcedure>
+        <steps>
+            <step>
+                <id>6</id>
+                <orderId>0</orderId>
+                <step>sdfsd11</step>
+            </step>
+        </steps>
+        <yesNoQuestion>fdgdfg dfgdfgdfd</yesNoQuestion>
+        <expectedResult>true</expectedResult>
+    </testProcedure>
+    <comment>dffdgdfg</comment>
+</TestUnitDescription>

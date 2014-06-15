@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<testsSet>
+    <created>2014-06-10 15:52:18</created>
+    <test>
+        <test>WCAG20-ARIA-TECHS/ARIA4_0000003</test>
+        <test>WCAG20-ARIA-TECHS/ARIA4_0000004</test>
+    </test>
+</testsSet>

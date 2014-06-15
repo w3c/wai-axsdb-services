@@ -9,8 +9,9 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import junit.framework.Assert;
+
 import org.junit.Test;
-import org.w3c.wai.accessdb.eao.AbstractTest;
 import org.w3c.wai.accessdb.om.Technique;
 import org.w3c.wai.accessdb.services.TechniquesService;
 import org.w3c.wai.accessdb.utils.ASBPersistenceException;
@@ -19,7 +20,7 @@ import org.w3c.wai.accessdb.utils.ASBPersistenceException;
  * @author evangelos.vlachogiannis
  * @since 08.05.2012
  */
-public class TestRequirementsService extends AbstractTest
+public class TestRequirementsService 
 {
     @Test
     public void testRetrieveTechniques() throws ASBPersistenceException
@@ -39,7 +40,7 @@ public class TestRequirementsService extends AbstractTest
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
 		}
-		assertEquals(reqs.size() ,60);
+		Assert.assertEquals(reqs.size() ,60);
     }
    
 

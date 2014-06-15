@@ -3,6 +3,7 @@
  */
 package org.w3c.wai.accessdb.eao;
 
+import java.io.IOException;
 import java.util.logging.Logger;
 
 import javax.persistence.EntityManager;
@@ -11,6 +12,9 @@ import javax.persistence.EntityManagerFactory;
 import junit.framework.TestCase;
 
 import org.junit.Ignore;
+import org.w3c.wai.accessdb.DummyDataFactory;
+import org.w3c.wai.accessdb.services.DBInitService;
+import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 
 /**
  * @author evangelos.vlachogiannis
@@ -32,10 +36,11 @@ public class AbstractTest extends TestCase
         super.setUp();
         if(!populated)
         {
-        	//DBPopulateService.INSTANCE.populateAll();
+        	this.populate();
         	populated = true;
         }
         	
+        
         
         /*
         try {
@@ -86,6 +91,18 @@ public class AbstractTest extends TestCase
       //  VFMemoryStorageFactory.purgeDatabase(new File("unit-testing-jpa").getCanonicalPath());
    */
     }
+    public void populate() throws ASBPersistenceException {
+		DBInitService.INSTANCE.initAll();
+		try {
+			if (EAOManager.INSTANCE.getTestResultsBunchEAO().findAll().size() < 1) {
+				DummyDataFactory.createDummyTestsAndResults(3, 3, 2, 3);
+			}
+		} catch (ClassNotFoundException | IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
 	
    
 }

@@ -1,0 +1,69 @@
+{
+    "optionalName": "",
+    "results": [
+        {
+            "testingProfile": {
+                "profileComment": null,
+                "userAgent": {
+                    "id": -1,
+                    "name": "Chrome",
+                    "vendor": null,
+                    "version": {
+                        "major": 0,
+                        "minor": 0,
+                        "revision": 0,
+                        "text": "34"
+                    },
+                    "engine": null
+                },
+                "platform": {
+                    "architecture": null,
+                    "version": {
+                        "major": 0,
+                        "minor": 0,
+                        "revision": 0,
+                        "text": "6.1"
+                    },
+                    "vendor": null,
+                    "name": "Windows",
+                    "id": -1
+                },
+                "assistiveTechnology": {
+                    "version": {
+                        "major": 0,
+                        "minor": 0,
+                        "revision": 0,
+                        "text": ""
+                    },
+                    "vendor": null,
+                    "name": "",
+                    "id": -1
+                },
+                "plugin": {
+                    "version": {
+                        "major": 0,
+                        "minor": 0,
+                        "revision": 0,
+                        "text": ""
+                    },
+                    "vendor": null,
+                    "name": "",
+                    "id": -1
+                }
+            },
+            "testUnitId": "ARIA1_0000001",
+            "testUnitDescription": {
+                "id": 1
+            },
+            "resultValue": "false",
+            "runDate": "2014-05-19T22:22:17.751Z",
+            "comment": "",
+            "type": "RESULT"
+        }
+    ],
+    "date": null,
+    "user": {
+        "id": -1,
+        "userId": "anon"
+    }
+}

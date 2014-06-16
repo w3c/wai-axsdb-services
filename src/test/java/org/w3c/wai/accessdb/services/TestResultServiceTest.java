@@ -21,7 +21,7 @@ public class TestResultServiceTest extends AbstractTest {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestResultServiceTest.class);
 
-	@Test
+	//@Test
 	public void testLoadTestResultViewTest() throws ASBPersistenceException {
 		TestResultFilter filter = new TestResultFilter();
 		String testUnitId = DummyDataFactory.getRandomTest().getTestUnitId();
@@ -67,15 +67,19 @@ public class TestResultServiceTest extends AbstractTest {
 			if(firstRow)
 			{
 				firstRow = false;
+				System.out.println("----------------------");
 				continue;
 			}
 			firstCol = true;
 			for(TestResultViewTableCell cell : row){
+				System.out.println(" | ");
 				if(firstCol)
 				{
+					System.out.println("|");
 					firstCol = false;
 					continue;
 				}
+				System.out.println(cell.getNoOfPass() + "/"+ cell.getNoOfAll()); 
 				all = all + Integer.parseInt(cell.getNoOfAll());
 			}
 		}
@@ -86,14 +90,14 @@ public class TestResultServiceTest extends AbstractTest {
 		Assert.assertEquals(allSimple, all);
 	}
 
-	@Test
+	//@Test
 	public void testSaveResult() throws ASBPersistenceException,
 			ClassNotFoundException, IOException {
 		TestUnitDescription tu = DummyDataFactory.populateOneTestWithResult();
 		Assert.assertEquals(tu.getId() > 0, true);
 	}
 
-	@Test
+	//@Test
 	public void testdeleteDeepTestUnitById() throws ASBPersistenceException,
 			ClassNotFoundException, IOException {
 		DBInitService.INSTANCE.initAll();

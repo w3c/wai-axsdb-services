@@ -251,6 +251,7 @@ public class TestUnitsResource {
  */
 	@POST
 	@Path("commit/{sessionId}")
+	@Produces({ MediaType.APPLICATION_JSON })
 	public Response testPersist(@Context HttpServletRequest req,
 			@PathParam("sessionId") String sessionId) {
 		try {
@@ -373,8 +374,6 @@ public class TestUnitsResource {
 			}
 			return Response.notModified(e.getLocalizedMessage()).build();
 		}
-		return Response
-				.created(URI.create(testUnitDescription.getTestUnitId()))
-				.build();
+		return Response.status(Status.OK).entity(testUnitDescription).build();
 	}
 }

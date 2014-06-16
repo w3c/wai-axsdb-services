@@ -74,9 +74,13 @@ public class TestingSessionResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	@Consumes({ MediaType.APPLICATION_JSON })
 	public Response login(LoginData  data) {
+		TestingSession s = null;
+		if(data.getSessionId()==null){
+			s = TestingSessionService.INSTANCE.createNewSession();
+			data.setSessionId(s.getSessionId());
+		}
 		if(!data.isValid())
 			return Response.status(Status.NOT_ACCEPTABLE).entity(data).build();
-		TestingSession s = null;
 		try {
 			s = TestingSessionService.INSTANCE.login(data);
 		} catch (ASBPersistenceException e) {

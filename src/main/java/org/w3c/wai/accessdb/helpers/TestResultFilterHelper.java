@@ -251,6 +251,8 @@ public class TestResultFilterHelper {
 		StringBuffer sql = new StringBuffer();
 		if (products.size() > 0) {
 			Iterator<SimpleProduct> iter = products.iterator();
+			sql.append(" ( ");
+
 			while (iter.hasNext()) {
 				SimpleProduct at = iter.next();
 				sql.append(" ( ");
@@ -266,6 +268,8 @@ public class TestResultFilterHelper {
 					sql.append(" OR ");
 				}
 			}
+			sql.append(" ) ");
+
 		}
 		return sql.toString();
 	}

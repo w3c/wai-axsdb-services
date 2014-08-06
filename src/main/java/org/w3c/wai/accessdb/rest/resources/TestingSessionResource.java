@@ -56,13 +56,23 @@ public class TestingSessionResource {
 	@Produces({ MediaType.APPLICATION_JSON })
 	public Response getSession(@PathParam("sessionid") String sessionid) {
 		TestingSession s = null;
-		s = TestingSessionService.INSTANCE.getSession(sessionid);
+		logger.info("getSession");
+		try{
+			s = TestingSessionService.INSTANCE.getSession(sessionid);			
+		}
+		catch(Exception e){
+			logger.error(e.getLocalizedMessage());
+		}
 		if(s==null){
 			s = TestingSessionService.INSTANCE.createNewSession();
-			return Response.status(Status.CREATED).entity(s).build();
 		}
-		else
+		boolean isAuthenticated = TestingSessionService.INSTANCE.isAuthenticated(s.getSessionId());
+		if(!isAuthenticated){
+			return Response.status(Status.FORBIDDEN).entity(s).build();			
+		}
+		else{
 			return Response.status(Status.OK).entity(s).build();
+		}
 	}
 	/**
 	 * Authentication / Authorization of the session

@@ -93,16 +93,19 @@ public enum TestingSessionService {
 
 	public TestingSession login(LoginData lData) throws ASBPersistenceException {
 		TestingSession session = this.getSession(lData.getSessionId());
+		if(session==null)
+			session = TestingSessionService.INSTANCE.createNewSession();
 		User user = AuthenicateService.INSTANCE.login(lData);
 		if (user == null)
 			return session;
 		session.setUserId(user.getUserId());
+		session.getUserRoles().clear();
 		for (String role : user.getUserRoles()) {
 			session.getUserRoles().add(role);
 		}
 		session.getUserTestingProfiles().addAll(user.getUserTestingProfiles());
-		this.sessions.put(lData.getSessionId(), session);
-		this.authenicatedSessions.put(lData.getSessionId(), user);
+		this.sessions.put(session.getSessionId(), session);
+		this.authenicatedSessions.put(session.getSessionId(), user);
 		return session;
 	}
 

@@ -23,13 +23,13 @@ public class TestingSession{
 	private List<String> testUnitIdList = new ArrayList<String>();
 	private List<TestResultSimple> testResultList = new ArrayList<TestResultSimple>();//TODO: remove
 	private List<RatingSimple> ratings = new ArrayList<RatingSimple>();
-	private List<UserTestingProfile> userTestingProfiles = null;
+	private List<UserTestingProfile> userTestingProfiles = new ArrayList<UserTestingProfile>();
 	private String currentTestUnitId = "-1";
 	
 	private int pCounter;
 	private TestUnitDescription lastTestUnit;
-	private TestResultFilter resultsFilter;
-	private TestResultFilter testsFilter;
+	private TestResultFilter resultsFilter = new TestResultFilter() ;
+	private TestResultFilter testsFilter = new TestResultFilter();
 	private String paramId;
 	private TestResultViewData resultsviewdata;
 	

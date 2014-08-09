@@ -1,6 +1,6 @@
 package org.w3c.wai.accessdb.jaxb;
 
-public class TechnologyCombination {
+public class TechnologyCombination implements Comparable<TechnologyCombination>{
 	private String atName;
 	private String atVersion;
 	private String uaName;
@@ -81,5 +81,12 @@ public class TechnologyCombination {
 	public String toString() {
 		return this.atName + " " + this.atVersion + " " + this.uaName + " "
 				+ this.uaVersion + " " + this.osName + " " + this.osVersion;
+	}
+
+	@Override
+	public int compareTo(TechnologyCombination c) {
+		String s1 = this.getUaName() + " " + this.getUaVersion();
+		String s2 = c.getUaName() + " " + c.getUaVersion();
+		return s1.compareTo(s1);
 	}
 }

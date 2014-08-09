@@ -6,11 +6,13 @@ package org.w3c.wai.accessdb.services;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.bind.JAXBException;
 
@@ -23,6 +25,7 @@ import org.w3c.wai.accessdb.jaxb.SimpleProduct;
 import org.w3c.wai.accessdb.jaxb.SimpleTestResult;
 import org.w3c.wai.accessdb.jaxb.SimpleTestResultsBunch;
 import org.w3c.wai.accessdb.jaxb.TechnologyCombination;
+import org.w3c.wai.accessdb.jaxb.TestResultData;
 import org.w3c.wai.accessdb.jaxb.TestResultDataOverview;
 import org.w3c.wai.accessdb.jaxb.TestResultFilter;
 import org.w3c.wai.accessdb.jaxb.TestResultTestOveview;
@@ -96,6 +99,7 @@ public enum TestResultsService {
 			TestResultFilter filter, String techId) {
 		// find unique combinations based on filter and technique
 		TestResultViewTable view = new TestResultViewTable();
+		List<TestResultData> dataList = new ArrayList<TestResultData>();
 		view.setId(techId);
 		List<Object[]> atCombinations = null;
 		try {
@@ -110,10 +114,21 @@ public enum TestResultsService {
 		logger.debug("getTestResultFullViewTechnique AT combinations: "
 				+ atCombinations.size());
 		// get Unique Agents and AT
-		HashMap<String, UAgent> agentsMap = new HashMap<String, UAgent>();
-		HashMap<String, AssistiveTechnology> atMap = new HashMap<String, AssistiveTechnology>();
+		LinkedHashMap<String, UAgent> agentsMap = new LinkedHashMap<String, UAgent>();
+		LinkedHashMap<String, AssistiveTechnology> atMap = new LinkedHashMap<String, AssistiveTechnology>();
+		List<TechnologyCombination> combinations = new ArrayList<TechnologyCombination>(atCombinations.size());
 		for (Object[] combO : atCombinations) {
 			TechnologyCombination comb = new TechnologyCombination(combO);
+			combinations.add(comb);
+		}
+		Collections.sort(combinations, new Comparator<TechnologyCombination>() {
+	        @Override public int compare(TechnologyCombination p1, TechnologyCombination p2) {
+	        	String s1 = p1.getUaName() + " " + p1.getUaVersion();
+	    		String s2 = p2.getUaName() + " " + p2.getUaVersion();
+	    		return s1.compareTo(s1);
+	        }
+	    });
+		for (TechnologyCombination comb : combinations) {
 			UAgent uAgent = new UAgent(comb.getUaName(), comb.getUaVersion());
 			agentsMap.put(uAgent.toString(), uAgent);
 			AssistiveTechnology at = new AssistiveTechnology(comb.getAtName(),
@@ -145,8 +160,10 @@ public enum TestResultsService {
 				TestResultViewTableCell agentCell = new TestResultViewTableCell();
 				agentCell.setType(TestResultViewTableCell.TYPE_DATA);
 				filter = new TestResultFilter();
-				filter.getAts().add(new SimpleProduct(atMap.get(atS)));
-				filter.getUas().add(new SimpleProduct(agentsMap.get(agentS)));
+				SimpleProduct at = new SimpleProduct(atMap.get(atS));
+				filter.getAts().add(at);
+				SimpleProduct ua = new SimpleProduct(agentsMap.get(agentS));
+				filter.getUas().add(ua);
 				String noOfAll = String.valueOf(EAOManager.INSTANCE
 						.getTestResultEAO()
 						.doSimpleQuery(
@@ -161,11 +178,23 @@ public enum TestResultsService {
 												filter, techId)).get(0));
 				agentCell.setNoOfAll(noOfAll);
 				agentCell.setNoOfPass(noOfPass);
+				
+				TestResultData resData = new TestResultData();
+				resData.setAtProduct(at);
+				resData.setUaProduct(ua);
+				resData.setNoOfAll(noOfAll);
+				resData.setNoOfPass(noOfPass);
+				dataList.add(resData);
+				
+				agentCell.setResData(resData);
 				row.add(agentCell);
+
 			}
 			logger.debug("tableRow: " + row);
 			view.getRows().add(row);
 		}
+		Collections.sort(dataList);
+		//view.setDataList(dataList);
 		logger.debug("tableView: " + view.toString());
 		return view;
 	}
@@ -222,8 +251,10 @@ public enum TestResultsService {
 				TestResultViewTableCell agentCell = new TestResultViewTableCell();
 				agentCell.setType(TestResultViewTableCell.TYPE_DATA);
 				filter = new TestResultFilter();
-				filter.getAts().add(new SimpleProduct(atMap.get(atS)));
-				filter.getUas().add(new SimpleProduct(agentsMap.get(agentS)));
+				SimpleProduct at = new SimpleProduct(atMap.get(atS));
+				filter.getAts().add(at);
+				SimpleProduct ua = new SimpleProduct(agentsMap.get(agentS));
+				filter.getUas().add(ua);
 				String noOfAll = String
 						.valueOf(EAOManager.INSTANCE
 								.getTestResultEAO()
@@ -242,6 +273,12 @@ public enum TestResultsService {
 								.get(0));
 				agentCell.setNoOfAll(noOfAll);
 				agentCell.setNoOfPass(noOfPass);
+				TestResultData resData = new TestResultData();
+				resData.setAtProduct(at);
+				resData.setUaProduct(ua);
+				resData.setNoOfAll(noOfAll);
+				resData.setNoOfPass(noOfPass);				
+				agentCell.setResData(resData);
 				row.add(agentCell);
 			}
 			logger.debug("tableRow: " + row);

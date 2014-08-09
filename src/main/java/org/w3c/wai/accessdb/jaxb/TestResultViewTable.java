@@ -13,7 +13,7 @@ public class TestResultViewTable
     private String id = "undefined";
 
     private List<List<TestResultViewTableCell>> rows = new ArrayList<List<TestResultViewTableCell>>();
-
+	private List<TestResultData> dataList = new ArrayList<TestResultData>();
     public List<List<TestResultViewTableCell>> getRows()
     {
         return rows;
@@ -36,6 +36,14 @@ public class TestResultViewTable
 
 	public void setId(String id) {
 		this.id = id;
+	}
+
+	public List<TestResultData> getDataList() {
+		return dataList;
+	}
+
+	public void setDataList(List<TestResultData> dataList) {
+		this.dataList = dataList;
 	}
 
 }

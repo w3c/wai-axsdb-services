@@ -14,7 +14,15 @@ public class TestResultViewTableCell
     private Product product = null; 
     private String noOfPass = "undefined";
     private String noOfAll = "undefined";
-    public String getType()
+    private TestResultData resData = null;
+    
+    public TestResultData getResData() {
+		return resData;
+	}
+	public void setResData(TestResultData resData) {
+		this.resData = resData;
+	}
+	public String getType()
     {
         return type;
     }

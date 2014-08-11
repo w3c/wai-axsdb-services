@@ -89,7 +89,7 @@ public enum TestsService {
 				TreeNodeData nodeTest = new TreeNodeData();
 				nodeTest.setType(TestUnitDescription.class.getSimpleName());
 				nodeTest.setId(String.valueOf(tu.getTestUnitId()));
-				nodeTest.setLabel(tu.getTestUnitId() + ": " + tu.getTitle());
+				nodeTest.setLabel(tu.getTitle());
 				nodeTest.setDescription(tu.getTitle());
 				nodeTest.setValue(String.valueOf(tu.getTestUnitId()));
 				nodeTest.setNoOfChildren(0);

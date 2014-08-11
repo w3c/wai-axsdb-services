@@ -15,12 +15,31 @@ public enum AuthenicateService {
 	private static final Logger logger =  LoggerFactory.getLogger(AuthenicateService.class);
 	
 	public static boolean isAuthenticatedAsExpert(User user) {
-		return isAuthenticatedAsRoleCode(user, ConfigService.INSTANCE.getConfigParam(ConfigService.USER_ROLE_AXSDBCOL_CODE)) || 
-				isAuthenticatedAsRoleCode(user, ConfigService.INSTANCE.getConfigParam(ConfigService.USER_ROLE_AXSDBW3C_CODE));
+		List<String> roles = ConfigService.INSTANCE.getConfigParamsList(ConfigService.USER_ROLE_AXSDBCOL_CODE);
+		return isAuthenticatedAsRoles(user, roles);
     }
 	public static boolean isAuthenticatedAsAdmin(User user) {
-		return isAuthenticatedAsRoleCode(user, ConfigService.INSTANCE.getConfigParam(ConfigService.USER_ROLE_AXSDBADM_CODE)) || 
-				isAuthenticatedAsRoleCode(user, ConfigService.INSTANCE.getConfigParam(ConfigService.USER_ROLE_AXSDBW3C_CODE));
+		List<String> roles = ConfigService.INSTANCE.getConfigParamsList(ConfigService.USER_ROLE_AXSDBADM_CODE);
+		return isAuthenticatedAsRoles(user, roles);
+    }
+	public static boolean isAuthenticatedAsRoles(User user, List<String> rolesToCheck) {
+		if(rolesToCheck!=null)
+		{
+			if(user.isW3cUser())
+			{
+				List<String> roles = user.getUserRoles();
+				for(String r : roles){
+					if(rolesToCheck.contains(r))
+						return true;
+				}
+			}
+			else
+			{
+				return rolesToCheck.contains(user.getRole());
+			}
+			
+		}
+        return false;
     }
 	public static boolean isAuthenticatedAsRoleCode(User user, String role) {
 		if(role!=null)

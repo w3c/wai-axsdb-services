@@ -380,6 +380,7 @@ public enum TestResultsService {
 				r.setComment((String)result[3]);
 				r.setRunDate((Date)result[4]);
 				r.setUserId((String)result[5]);
+				r.setResultId((long)result[6]); 
 	            results.add(r);
 	        }
 			
@@ -439,6 +440,25 @@ public enum TestResultsService {
 			EAOManager.INSTANCE.getTestResultEAO().delete(testResult);
 		}
 
+	}
+	public void updateTestResult(TestResult r) throws ASBPersistenceException{
+		TestResult r1 = EAOManager.INSTANCE.getTestResultEAO().findById(r.getId());
+		if(r1!=null && r!= null && r.getId() == r1.getId()){
+			EAOManager.INSTANCE.getTestResultEAO().persist(r1);
+		}
+	}
+	public void deleteTestResultById(long  resId)
+			throws ASBPersistenceException {
+		TestResultsBunch b = EAOManager.INSTANCE.getTestResultsBunchEAO()
+				.findbyTestResultId(resId);
+		TestResult r = EAOManager.INSTANCE.getTestResultEAO().findById(resId);
+		List<TestResult> results = b.getResults();		
+		if(results.contains(r)){
+			results.remove(r);
+			b.setResults(results);
+			EAOManager.INSTANCE.getTestResultsBunchEAO().persist(b);
+			EAOManager.INSTANCE.getTestResultEAO().delete(r);
+		}
 	}
 
 	public boolean importAllTestResults(String indexFilePath)

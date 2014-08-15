@@ -165,7 +165,7 @@ public class TestResultFilterHelper {
 	public static String buildHQL4SimpleTestResults(TestResultFilter filter) {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select DISTINCT r.testingProfile as testingProfile, r.testUnitDescription.testUnitId as testUnitId, "
-				+ "r.resultValue as resultValue, r.comment as comment, r.runDate as runDate, b.user.userId as userId "
+				+ "r.resultValue as resultValue, r.comment as comment, r.runDate as runDate, b.user.userId as userId, r.id as resultId "
 				+ "from TestResult as r, TestResultsBunch b where r in elements(b.results) ");
 		sql.append(filterSubQuery(filter, "r", true));
 		logger.debug(sql.toString());

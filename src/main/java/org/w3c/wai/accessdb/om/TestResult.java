@@ -103,7 +103,4 @@ public class TestResult extends BaseEntity
 	public void setRunDate(Date runDate) {
 		this.runDate = runDate;
 	}
-
-	
-
 }

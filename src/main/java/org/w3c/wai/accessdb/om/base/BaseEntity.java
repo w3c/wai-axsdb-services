@@ -31,5 +31,23 @@ public abstract class BaseEntity implements Serializable
     {
         this.id = id;
     }
+    
+    @Override
+    public boolean equals(Object object)
+    {
+        boolean isEqual= false;
 
+        if (object != null && object instanceof BaseEntity)
+        {
+            isEqual = (this.getId() == ((BaseEntity) object).getId());
+        }
+
+        return isEqual;
+    }
+
+    @Override
+    public int hashCode() {
+        return (int) this.getId();
+    }
+	
 }

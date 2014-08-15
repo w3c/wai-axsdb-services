@@ -23,6 +23,8 @@ public class SimpleTestResult {
     @XmlSchemaType(name = "date")
     private Date runDate;
     private String userId;
+    private long resultId;
+    
     
 	public SimpleTestResult() {
 		super();
@@ -34,6 +36,13 @@ public class SimpleTestResult {
 		this.comment = r.getComment();
 		this.runDate = r.getRunDate();
 		this.userId = userId;
+	}
+	
+	public long getResultId() {
+		return resultId;
+	}
+	public void setResultId(long resultId) {
+		this.resultId = resultId;
 	}
 	public String getUserId() {
 		return userId;

@@ -60,7 +60,7 @@ public class TestUnitDescription extends BaseEntity implements Cloneable{
     private String description;
     @XmlElement(required = true)
     @Enumerated(EnumType.STRING) 
-    private StatusType status;
+    private StatusType status = StatusType.UNCONFIRMED;
     @XmlElement(required = true)
     private String creator;
     @XmlElement(required = true)

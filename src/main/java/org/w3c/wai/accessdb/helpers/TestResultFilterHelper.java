@@ -154,7 +154,7 @@ public class TestResultFilterHelper {
 		StringBuffer sql = new StringBuffer();
 		sql.append("select DISTINCT r from TestResult as r ");
 		if (filter.getAts().size() > 0 || filter.getOss().size() > 0
-				|| filter.getUas().size() > 0)
+				|| filter.getUas().size() > 0 || filter.getStatusList().size()>0)
 			sql.append(" where ");
 		sql.append(filterSubQuery(filter, "r", false));
 		logger.debug(sql.toString());
@@ -291,6 +291,9 @@ public class TestResultFilterHelper {
 		if (filter.getTechniques().size() > 0)
 			stmnts.add(sqlIN(prefix + ".testUnitDescription.technique.nameId",
 					filter.getTechniques()));
+		if (filter.getStatusList().size() > 0)
+			stmnts.add(sqlIN(prefix+ ".testUnitDescription.status",
+					filter.getStatusList()));
 		StringBuffer sql = new StringBuffer();
 		String[] array = stmnts.toArray(new String[0]);
 		if(startAnd && array.length>0)

@@ -17,14 +17,22 @@ public class TestResultFilter extends BaseEntity{
 	private Date lastModified = new Date();
 	private String userName; 
 	private String criteriosLevel;
-	List<String> criterios = new ArrayList<String>();	
-	List<String> technologies = new ArrayList<String>();	
-	List<SimpleProduct> ats = new ArrayList<SimpleProduct>();
-	List<SimpleProduct> uas = new ArrayList<SimpleProduct>();
-	List<SimpleProduct> oss = new ArrayList<SimpleProduct>();
-	List<String> techniques = new ArrayList<String>();	
-	List<String> tests = new ArrayList<String>();	
-
+	private List<String> criterios = new ArrayList<String>();	
+	private List<String> technologies = new ArrayList<String>();	
+	private List<SimpleProduct> ats = new ArrayList<SimpleProduct>();
+	private List<SimpleProduct> uas = new ArrayList<SimpleProduct>();
+	private List<SimpleProduct> oss = new ArrayList<SimpleProduct>();
+	private List<String> techniques = new ArrayList<String>();	
+	private List<String> tests = new ArrayList<String>();	
+	private List<String> statusList = new ArrayList<String>();	
+	
+	
+	public List<String> getStatusList() {
+		return statusList;
+	}
+	public void setStatusList(List<String> statusList) {
+		this.statusList = statusList;
+	}
 	public List<String> getTechniques() {
 		return techniques;
 	}

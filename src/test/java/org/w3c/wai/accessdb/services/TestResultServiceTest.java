@@ -22,6 +22,18 @@ import org.w3c.wai.accessdb.utils.ASBPersistenceException;
 public class TestResultServiceTest extends AbstractTest {
 	private static final Logger logger = LoggerFactory
 			.getLogger(TestResultServiceTest.class);
+	
+	@Test
+	public void testResultsFilterWithStatus() throws ClassNotFoundException, ASBPersistenceException, IOException{
+		TestUnitDescription tu = DummyDataFactory.populateOneTestWithResult();
+		logger.info(tu.getStatus().toString());
+		TestResultFilter filter = new TestResultFilter();
+		String all = EAOManager.INSTANCE.getTestResultEAO().countAllByTechniqueNameId(tu.getTechnique().getNameId());
+		filter.getStatusList().add("UNCONFIRMED");
+		filter.getStatusList().add("ACCEPTED");
+		TestResultViewTable res = TestResultsService.INSTANCE.loadTestResultFullViewTechnique(filter, tu.getTechnique().getNameId());
+		System.out.print(res.getRows().size());
+	}
 
 	// @Test
 	public void testLoadTestResultViewTest() throws ASBPersistenceException {
@@ -121,7 +133,7 @@ public class TestResultServiceTest extends AbstractTest {
 		Assert.assertEquals(no_new, 0);
 	}
 
-	@Test
+	//@Test
 	public void testdeleteTestResultById() throws ASBPersistenceException,
 			ClassNotFoundException, IOException {
 		DBInitService.INSTANCE.initAll();

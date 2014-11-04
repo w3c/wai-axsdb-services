@@ -12,6 +12,8 @@ import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import javax.naming.ldap.LdapName;
+import javax.naming.ldap.Rdn;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +49,7 @@ public class W3LDAPAuthenticator {
 			logger.info("login success " + username);
 			SearchControls controls = new SearchControls();
 			controls.setSearchScope(SearchControls.SUBTREE_SCOPE);
-			String[] returnedAtts = { "mail", "displayName", "memberOf" };
+			String[] returnedAtts = { "mail", "displayName", "memberOf", "cn" };
 			controls.setReturningAttributes(returnedAtts);
 			results = ctx.search(dn, "(objectclass=*)", controls);
 			while (results.hasMore()) {
@@ -61,10 +63,15 @@ public class W3LDAPAuthenticator {
 				Attribute memberOf = attributes.get("memberOf");
 				for (NamingEnumeration ae = memberOf.getAll(); ae.hasMore();) {
 					String attr = (String) ae.nextElement();
-					Attributes attrs = ctx.getAttributes(attr);
-					this.user.getUserRoles().add((String) attrs.get("cn").get());
+					LdapName ln = new LdapName(attr);
+					for(Rdn rdn : ln.getRdns()) {
+					    if(rdn.getType().equalsIgnoreCase("cn") && rdn.getValue()!=null) {
+							this.user.getUserRoles().add((String) rdn.getValue());						
+					        break;
+					    }
+					}
 				}
-			}
+			} 
 		} catch (AuthenticationException ex) {
 			logger.info("Authenitcation failed");
 			logger.debug(ex.getLocalizedMessage());

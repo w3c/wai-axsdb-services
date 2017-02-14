@@ -1,6 +1,7 @@
 # Accessibility Support Database Services
 
-This is the server side of the Accessibility Support Database offering CRUD REST Services to the front end.
+This is the server side of the Accessibility Support Database offering CRUD REST Services to the [front end](https://github.com/w3c/wai-axsdb-web).
+
 Project page: http://www.w3.org/WAI/ACT/
 
 ## Table of Contents
@@ -702,3 +703,7 @@ TODO
 + create test files folder
 + create log folder
 + config files
+
+## Licence 
+
+[WAI-ACT Public License/ Apache License, Version 2.0](https://github.com/w3c/wai-axsdb-services/blob/master/LICENSE.md).
